@@ -457,7 +457,7 @@ const Navbar = () => {
           </div>
         )}
 
-        <Link href="/profile">
+        <Link href="/passport">
           {avatarUrl && (currentWallet || accounts.current?.length > 0) && (
             <img src={avatarUrl} alt="Avatar" style={{ width: 45 }} />
           )}{" "}

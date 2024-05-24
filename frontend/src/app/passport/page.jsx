@@ -4,7 +4,7 @@ import { NFTStorage } from "nft.storage";
 const API_KEY = process.env.NEXT_PUBLIC_STORAGE_API;
 const client = new NFTStorage({ token: API_KEY });
 
-const page = () => {
+const Passport = () => {
 
     const [name, setname] = useState("");
     const [species, setspecies] = useState("");
@@ -333,4 +333,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Passport;

@@ -304,7 +304,7 @@ const Passport = () => {
                 <div className="w-1/2">
                   <div className="mt-6 text-xl">Age of Pet</div>
                   <input
-                    type="text"
+                    type="number"
                     placeholder="Pet Age"
                     required
                       value={age}
@@ -386,7 +386,7 @@ const Passport = () => {
                 <div className="w-1/2">
                   <div className="mt-10 text-xl">Microchip number</div>
                   <input
-                    type="text"
+                    type="number"
                     placeholder="Microchip number"
                     required
                       value={micronumber}
@@ -508,7 +508,7 @@ const Passport = () => {
                 className="rounded-lg py-4 px-10 text-white justify-end flex ml-auto text-xl"
                 style={{ backgroundColor: '#008770' }}
               >
-                Launch
+                Submit Pet Details
               </button>
 
             </form>

@@ -1,10 +1,36 @@
 "use client"
-import React, {useState} from "react";
+import React, {useState, useRef} from "react";
 import { NFTStorage } from "nft.storage";
+import { getFullnodeUrl, SuiClient } from '@mysten/sui.js/client';
+import { TransactionBlock } from '@mysten/sui.js/transactions';
+import {
+  SerializedSignature,
+  decodeSuiPrivateKey,
+} from "@mysten/sui.js/cryptography";
+import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 const API_KEY = process.env.NEXT_PUBLIC_STORAGE_API;
 const client = new NFTStorage({ token: API_KEY });
 
 const Passport = () => {
+
+  const accountDataKey = "zklogin-demo.accounts";
+  const accounts = useRef(loadAccounts()); // useRef() instead of useState() because of setInterval()
+    const NETWORK = 'devnet';
+    const suiClient = new SuiClient({
+      url: getFullnodeUrl(NETWORK),
+  });
+
+  function loadAccounts(){
+    if(typeof window !== 'undefined'){
+    const dataRaw = sessionStorage.getItem(accountDataKey);
+    if (!dataRaw) {
+      return [];
+    }
+    
+    const data = JSON.parse(dataRaw);
+    return data;
+  }
+  }
 
     const [name, setname] = useState("");
     const [species, setspecies] = useState("");
@@ -20,6 +46,9 @@ const Passport = () => {
     const [microlocation, setmicrolocation] = useState("");
     const [petimg, setpetimg] = useState("");
     const [checked, setChecked] = useState(null);
+
+    const [loading, setLoading] = useState(false);
+    const [createpassportdone, setcreatepassportdone] = useState(false);
 
       // Handler functions for checkbox click events
   const handleYesChange = () => {
@@ -50,6 +79,143 @@ const Passport = () => {
     return String(uri).slice(7);
   };
 
+  function keypairFromSecretKey(privateKeyBase64) {
+    const keyPair = decodeSuiPrivateKey(privateKeyBase64);
+    return Ed25519Keypair.fromSecretKey(keyPair.secretKey);
+  }
+
+  async function sendTransaction(account, ipfsmetahashnfturl) {
+    
+    try {
+      console.log('[sendTransaction] Starting transaction');
+  
+      // Sign the transaction bytes with the ephemeral private key
+      const txb = new TransactionBlock();
+      const packageObjectId = "0x057c09954d66fbac812e61f165a48e0e201f86b07abab3ae15698785986c55fc";
+
+      if(checked === "yes")
+        {
+          txb.moveCall({
+            target: `${packageObjectId}::pet::list_adoption`,
+            arguments: [
+              txb.pure(""),        // Name argument
+              txb.pure(ipfsmetahashnfturl), // Description argument
+            ],
+          });
+        }
+        else{
+          const mintCoin = txb.splitCoins(txb.gas, [txb.pure("1000000000")]);
+
+          txb.setGasBudget(100000000);
+
+          txb.moveCall({
+            target: `${packageObjectId}::pet::mint_passport`,
+            arguments: [
+              txb.pure([name, species, breed, gender, age, color]),        // Name argument
+              txb.pure(ipfsmetahashnfturl), // Description argument
+              txb.pure([ownername, contact]),   
+              txb.pure(address),   
+              txb.pure([micronumber, microdate, microlocation]),   
+              mintCoin,
+              txb.object('0x6a79e24c586658d90f6d97eb3416c162a3c5bbfeb748ace6598eb8eef64d02b5')
+            ],
+          });
+        }
+      
+  
+      txb.setSender(accounts.current[0].userAddr);
+      console.log('[sendTransaction] Account address:', accounts.current[0].userAddr);
+  
+      const ephemeralKeyPair = keypairFromSecretKey(account.ephemeralPrivateKey);
+      const { bytes, signature: userSignature } = await txb.sign({
+        client: suiClient,
+        signer: ephemeralKeyPair,
+      });
+  
+      console.log('[sendTransaction] Transaction signed:', { bytes, userSignature });
+  
+      // Generate an address seed by combining userSalt, sub (subject ID), and aud (audience)
+      const addressSeed = genAddressSeed(
+        window.BigInt(account.userSalt),
+        'sub',
+        account.sub,
+        account.aud,
+      ).toString();
+  
+      console.log('[sendTransaction] Address seed generated:', addressSeed);
+  
+      // Serialize the zkLogin signature by combining the ZK proof (inputs), the maxEpoch,
+      // and the ephemeral signature (userSignature)
+      const zkLoginSignature = getZkLoginSignature({
+        inputs: {
+          ...account.zkProofs,
+          addressSeed,
+        },
+        maxEpoch: account.maxEpoch,
+        userSignature,
+      });
+  
+      console.log('[sendTransaction] ZK Login signature created:', zkLoginSignature);
+  
+      // Execute the transaction
+      const result = await suiClient.executeTransactionBlock({
+        transactionBlock: bytes,
+        signature: zkLoginSignature,
+        options: {
+          showEffects: true,
+        },
+      });
+  
+      console.debug('[sendTransaction] executeTransactionBlock response:', result);
+   
+      // await queryevents();
+    } catch (error) {
+      console.warn('[sendTransaction] executeTransactionBlock failed:', error);
+    }
+  }
+
+
+  const submitDataForPassport = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+
+        let petData = {
+          name: name,
+          species: species,
+          breed: breed,
+          gender: gender,
+          age: age,
+          color: color,
+          ownername: ownername,
+          address: address,
+          contact: contact,
+          micronumber: micronumber,
+          microdate: microdate,
+          microlocation: microlocation,
+          petimg: petimg
+        };
+
+        console.log("pet data", petData);
+
+        const petNFTdata = JSON.stringify(petData);
+      const blobDatanft = new Blob([petNFTdata]);
+      const metaHashnft = await client.storeBlob(blobDatanft);
+      const ipfsmetahashnft = `ipfs://${metaHashnft}`;
+
+      sendTransaction(accounts.current[0], ipfsmetahashnft);
+
+      console.log("passport created")
+      setcreatepassportdone(true);
+    
+    } catch (error) {
+      console.error('Error handling', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div
       className=""
@@ -64,7 +230,10 @@ const Passport = () => {
         </div>
         <div className="flex flex-col justify-center items-center">
           <div className="w-2/3 bg-white px-10 pt-10 pb-32 text-black rounded-3xl">
-            <form>
+            <form id="myForm"
+                    onSubmit={(e) => {
+                      submitDataForPassport(e);
+                    }}>
               <div className="font-bold text-4xl">Pet Information</div>
 
               <div className="flex justify-between gap-4">
@@ -324,6 +493,15 @@ const Passport = () => {
 
                 
               </div>
+
+              <button
+                type="submit"
+                value="submit"
+                className="rounded-lg py-4 px-10 text-white justify-end flex ml-auto text-xl"
+                style={{ backgroundColor: '#008770' }}
+              >
+                Launch
+              </button>
 
             </form>
           </div>

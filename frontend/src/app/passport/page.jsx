@@ -1,5 +1,7 @@
 "use client"
 import React, {useState, useRef} from "react";
+import Link from "next/link";
+import Navbar from "../../../components/Navbar";
 import { NFTStorage } from "nft.storage";
 import { getFullnodeUrl, SuiClient } from '@mysten/sui.js/client';
 import { TransactionBlock } from '@mysten/sui.js/transactions';
@@ -226,7 +228,13 @@ const Passport = () => {
     >
       <div className="max-w-7xl mx-auto">
         <div className="justify-between flex">
-          <img src="/petpasslogo.png" className="w-24 h-34 pt-10" />
+        <Link href="/">
+       <img src="/petpasslogo.png" className="w-24 h-34 pt-10"/>
+       </Link>
+       {/* <Link href="/passport" className="border px-4 py-3 rounded-full my-10 my-auto">Create passport</Link> */}
+       <div className="my-10 my-auto">
+       <Navbar />
+       </div>
         </div>
         <div className="flex flex-col justify-center items-center">
           <div className="w-2/3 bg-white px-10 pt-10 pb-32 text-black rounded-3xl">

@@ -336,7 +336,9 @@ function OwnedObjects() {
 <div className="" style={{backgroundImage: 'url(https://wallpapers.com/images/hd/brown-background-u240zdqxs8ns0qnx.jpg)'}} >
       <div className="max-w-7xl mx-auto h-screen">
         <div className="justify-between flex">
+          <Link href="/">
        <img src="/petpasslogo.png" className="w-24 h-34 pt-10"/>
+       </Link>
        {/* <Link href="/passport" className="border px-4 py-3 rounded-full my-10 my-auto">Create passport</Link> */}
        <div className="my-10 my-auto">
        <Navbar />

@@ -514,6 +514,27 @@ const Passport = () => {
             </form>
           </div>
         </div>
+
+        {loading && (
+        <div
+          style={{ backgroundColor: "#222944E5" }}
+          className="flex overflow-y-auto overflow-x-hidden fixed inset-0 z-50 justify-center items-center w-full max-h-full"
+          id="popupmodal"
+        >
+          <div className="relative p-4 lg:w-1/5 w-full max-w-2xl max-h-full">
+            <div className="relative rounded-lg shadow">
+              <div className="flex justify-center gap-4">
+                <img
+                  className="w-100 h-90"
+                  src="/loader.gif"
+                  alt="Loading icon"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       </div>
     </div>
   );

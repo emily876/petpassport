@@ -95,6 +95,9 @@ style={{backgroundImage: 'url(https://wallpapers.com/images/hd/brown-background-
         </div>
         <img src="https://www.allydvm.com/-/media/assets/allydvm/images/solutions/petpage-patient-portal/petpage_header_resized_new.jpg?h=460&iar=0&w=950&hash=C048880F00BCC10AFB800B3EDE38255C" className='w-3/4'/>
 
+        <div className=''>
+          <div className='font-bold text-5xl mt-20' style={{color:'#640D6B'}}>Pets for adoption</div>
+        </div>
         </div>
         </div>
     </div>

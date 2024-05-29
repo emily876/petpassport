@@ -97,7 +97,7 @@ const Passport = () => {
     
     //   // define a programmable transaction
       const txb = new TransactionBlock();
-      const packageObjectId = "0x9d895bc8994b20093b7bfcee6309dde84b797a521c5135a90c644afe20b55730";    
+      const packageObjectId = "0xf87d4e1373b8c7356c9bd5c5f47005e12ea4ead0c5c81927f5c0da0de69820be";    
      try{
     
       if(checked === "yes")
@@ -119,22 +119,22 @@ const Passport = () => {
           txb.moveCall({
             target: `${packageObjectId}::pet::mint_passport`,
             arguments: [
-              txb.pure([[name], [species], [breed], [gender],[ age], [color]]),        // Name argument
-              txb.pure(ipfsmetahashnfturl), // Description argument
-              txb.pure([[ownername], [contact]]),   
-              txb.pure(address),   
-              txb.pure([[micronumber], [microdate], [microlocation]]),   
+              txb.pure(`${name};${species};${breed};${gender};${age};${color}`),
+              txb.pure(`${ipfsmetahashnfturl}`), // Description argument
+              txb.pure(`${ownername};${contact}`),   
+              txb.pure("0xdc22aba53764a4c86c0d506d215a898b824344564c2cb20ae247c0466bb4b851"),   
+              txb.pure(`${micronumber};${microdate};${microlocation}`),   
               mintCoin,
-              txb.object(' 0x548e0939880167e76704fa6bdbfc1744321a9e3923c5b7ac0307d3cdfb5e4329')
+              txb.object('0x966469b8b7c06ce5040dcd2870b07d679897b4611063984b8330201ba42650ef')
             ],
           }); 
               
         }
-        await wallet.signAndExecuteTransactionBlock({
+        const resdata = await wallet.signAndExecuteTransactionBlock({
           transactionBlock: txb,
         });
       
-        console.log('nft minted successfully!', resData);
+        console.log('nft minted successfully!', resdata);
         alert('Congrats! your nft is minted!')
       
       

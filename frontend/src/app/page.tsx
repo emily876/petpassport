@@ -73,9 +73,9 @@ export default function Home() {
     <main>
 
 <div className="z-0" 
-style={{backgroundImage: 'url(https://wallpapers.com/images/hd/brown-background-u240zdqxs8ns0qnx.jpg)'}}
+style={{backgroundImage: 'url(https://wallpapers.com/images/hd/brown-background-u240zdqxs8ns0qnx.jpg)', backgroundSize:'cover', backgroundRepeat:'no repeat', backgroundPosition:'center'}}
  >
-      <div className="max-w-7xl mx-auto h-screen">
+      <div className="max-w-7xl mx-auto">
         <div className="justify-between flex">
           <Link href="/">
        <img src="/petpasslogo.png" className="w-24 h-34 pt-10"/>
@@ -86,14 +86,14 @@ style={{backgroundImage: 'url(https://wallpapers.com/images/hd/brown-background-
        </div>
        
        </div>
-      <div className="flex flex-col justify-center items-center">
+      <div className="flex flex-col justify-center items-center min-h-screen">
       <div className='w-2/3'>
-          <div className='font-bold text-5xl'>Create your pet passport today</div>
+          <div className='font-bold text-5xl' style={{color:'#640D6B'}}>Create your pet passport today</div>
           <div className='text-black text-lg my-10'>Secure storage of pet records on the blockchain for immutability and transparency. 
             Maintain a unified official document for your pet for multiple purposes such as travel, 
             clinic visits, pet hotel checkins, etc.</div>
         </div>
-        <img src="https://img.freepik.com/premium-photo/dogs-cats-peeking-clear-solid-blue-top-line-petshop-banner-happy-smile-funny-generative-ai-image-weber_31965-192244.jpg" className='w-3/4'/>
+        <img src="https://www.allydvm.com/-/media/assets/allydvm/images/solutions/petpage-patient-portal/petpage_header_resized_new.jpg?h=460&iar=0&w=950&hash=C048880F00BCC10AFB800B3EDE38255C" className='w-3/4'/>
 
         </div>
         </div>

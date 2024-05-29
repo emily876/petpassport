@@ -226,7 +226,7 @@ const Passport = () => {
                       value={name}
                       onChange={(e) => setname(e.target.value.replace(/;/g, ''))}
                     className="mt-2 shadow border appearance-none rounded-xl w-full py-4 px-6 text-gray-200 leading-tight focus:outline-none focus:shadow-outline"
-                    style={{ color: "black", backgroundColor: "#0B6A604D" }}
+                    style={{ color: "black", backgroundColor: "#F3CCF3" }}
                   />
                 </div>
 
@@ -239,7 +239,7 @@ const Passport = () => {
                       value={species}
                       onChange={(e) => setspecies(e.target.value.replace(/;/g, ''))}
                     className="mt-2 shadow border appearance-none rounded-xl w-full py-4 px-6 text-gray-200 leading-tight focus:outline-none focus:shadow-outline"
-                    style={{ color: "black", backgroundColor: "#0B6A604D" }}
+                    style={{ color: "black", backgroundColor: "#F3CCF3" }}
                   />
                 </div>
               </div>
@@ -254,7 +254,7 @@ const Passport = () => {
                       value={breed}
                       onChange={(e) => setbreed(e.target.value.replace(/;/g, ''))}
                     className="mt-2 shadow border appearance-none rounded-xl w-full py-4 px-6 text-gray-200 leading-tight focus:outline-none focus:shadow-outline"
-                    style={{ color: "black", backgroundColor: "#0B6A604D" }}
+                    style={{ color: "black", backgroundColor: "#F3CCF3" }}
                   />
                 </div>
 
@@ -267,7 +267,7 @@ const Passport = () => {
                       value={gender}
                       onChange={(e) => setgender(e.target.value.replace(/;/g, ''))}
                     className="mt-2 shadow border appearance-none rounded-xl w-full py-4 px-6 text-gray-200 leading-tight focus:outline-none focus:shadow-outline"
-                    style={{ color: "black", backgroundColor: "#0B6A604D" }}
+                    style={{ color: "black", backgroundColor: "#F3CCF3" }}
                   />
                 </div>
               </div>
@@ -282,7 +282,7 @@ const Passport = () => {
                       value={age}
                       onChange={(e) => setage(e.target.value.replace(/;/g, ''))}
                     className="mt-2 shadow border appearance-none rounded-xl w-full py-4 px-6 text-gray-200 leading-tight focus:outline-none focus:shadow-outline"
-                    style={{ color: "black", backgroundColor: "#0B6A604D" }}
+                    style={{ color: "black", backgroundColor: "#F3CCF3" }}
                   />
                 </div>
 
@@ -295,7 +295,7 @@ const Passport = () => {
                       value={color}
                       onChange={(e) => setcolor(e.target.value.replace(/;/g, ''))}
                     className="mt-2 shadow border appearance-none rounded-xl w-full py-4 px-6 text-gray-200 leading-tight focus:outline-none focus:shadow-outline"
-                    style={{ color: "black", backgroundColor: "#0B6A604D" }}
+                    style={{ color: "black", backgroundColor: "#F3CCF3" }}
                   />
                 </div>
               </div>
@@ -315,7 +315,7 @@ const Passport = () => {
                       value={ownername}
                       onChange={(e) => setownername(e.target.value.replace(/;/g, ''))}
                     className="mt-2 shadow border appearance-none rounded-xl w-full py-4 px-6 text-gray-200 leading-tight focus:outline-none focus:shadow-outline"
-                    style={{ color: "black", backgroundColor: "#0B6A604D" }}
+                    style={{ color: "black", backgroundColor: "#F3CCF3" }}
                   />
                 </div>
 
@@ -328,7 +328,7 @@ const Passport = () => {
                       value={address}
                       onChange={(e) => setaddress(e.target.value.replace(/;/g, ''))}
                     className="mt-2 shadow border appearance-none rounded-xl w-full py-4 px-6 text-gray-200 leading-tight focus:outline-none focus:shadow-outline"
-                    style={{ color: "black", backgroundColor: "#0B6A604D" }}
+                    style={{ color: "black", backgroundColor: "#F3CCF3" }}
                   />
                 </div>
               </div>
@@ -343,7 +343,7 @@ const Passport = () => {
                       value={contact}
                       onChange={(e) => setcontact(e.target.value.replace(/;/g, ''))}
                     className="mt-2 shadow border appearance-none rounded-xl w-full py-4 px-6 text-gray-200 leading-tight focus:outline-none focus:shadow-outline"
-                    style={{ color: "black", backgroundColor: "#0B6A604D" }}
+                    style={{ color: "black", backgroundColor: "#F3CCF3" }}
                   />
                 </div>
               </div>
@@ -364,7 +364,7 @@ const Passport = () => {
                       value={micronumber}
                       onChange={(e) => setmicronumber(e.target.value.replace(/;/g, ''))}
                     className="mt-2 shadow border appearance-none rounded-xl w-full py-4 px-6 text-gray-200 leading-tight focus:outline-none focus:shadow-outline"
-                    style={{ color: "black", backgroundColor: "#0B6A604D" }}
+                    style={{ color: "black", backgroundColor: "#F3CCF3" }}
                   />
                 </div>
 
@@ -377,7 +377,7 @@ const Passport = () => {
                       value={microdate}
                       onChange={(e) => setmicrodate(e.target.value.replace(/;/g, ''))}
                     className="mt-2 shadow border appearance-none rounded-xl w-full py-4 px-6 text-gray-200 leading-tight focus:outline-none focus:shadow-outline"
-                    style={{ color: "black", backgroundColor: "#0B6A604D" }}
+                    style={{ color: "black", backgroundColor: "#F3CCF3" }}
                   />
                 </div>
               </div>
@@ -392,7 +392,7 @@ const Passport = () => {
                       value={microlocation}
                       onChange={(e) => setmicrolocation(e.target.value.replace(/;/g, ''))}
                     className="mt-2 shadow border appearance-none rounded-xl w-full py-4 px-6 text-gray-200 leading-tight focus:outline-none focus:shadow-outline"
-                    style={{ color: "black", backgroundColor: "#0B6A604D" }}
+                    style={{ color: "black", backgroundColor: "#F3CCF3" }}
                   />
                 </div>
               </div>
@@ -478,7 +478,7 @@ const Passport = () => {
                 type="submit"
                 value="submit"
                 className="rounded-lg py-4 px-10 text-white justify-end flex ml-auto text-xl"
-                style={{ backgroundColor: '#008770' }}
+                style={{ backgroundColor: '#640D6B' }}
               >
                 Submit Pet Details
               </button>

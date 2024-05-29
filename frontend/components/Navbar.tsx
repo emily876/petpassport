@@ -43,18 +43,15 @@ const Navbar = () => {
   }, []);
 
   return (
-    <>
-
-       
-<div className=" z-10 h-5 w-5">
-        <Link href="/passport">
+<div className="flex gap-2">
+  <Link href="/passport" className="text-white font-bold rounded-lg py-2 px-10 text-lg" style={{backgroundColor:'#640D6B'}}>Pet Form</Link>
+        <ConnectButton />
+        <Link href="/dashboard">
           {avatarUrl && (
             <img src={avatarUrl} alt="Avatar" style={{ width: 45 }} />
           )}{" "}
         </Link>
-        <ConnectButton />
         </div>
-        </>
   );
 
 };

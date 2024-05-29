@@ -4,12 +4,14 @@ import Link from "next/link";
 import Navbar from "../../../components/Navbar";
 import { NFTStorage } from "nft.storage";
 import { getFullnodeUrl, SuiClient } from '@mysten/sui.js/client';
-import { TransactionBlock } from '@mysten/sui.js/transactions';
+import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
+import { TransactionBlock } from "@mysten/sui.js/transactions";
 import {
   SerializedSignature,
   decodeSuiPrivateKey,
 } from "@mysten/sui.js/cryptography";
-import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
+
+import {useWallet} from '@suiet/wallet-kit'
 const API_KEY = process.env.NEXT_PUBLIC_STORAGE_API;
 const client = new NFTStorage({ token: API_KEY });
 
@@ -51,6 +53,7 @@ const Passport = () => {
 
     const [loading, setLoading] = useState(false);
     const [createpassportdone, setcreatepassportdone] = useState(false);
+    const wallet = useWallet();
 
       // Handler functions for checkbox click events
   const handleYesChange = () => {
@@ -76,6 +79,8 @@ const Passport = () => {
     }
   }
 
+
+  
   const removePrefix = (uri) => {
     console.log("uri", uri);
     return String(uri).slice(7);
@@ -86,15 +91,15 @@ const Passport = () => {
     return Ed25519Keypair.fromSecretKey(keyPair.secretKey);
   }
 
-  async function sendTransaction(account, ipfsmetahashnfturl) {
+  async function sendTransaction(ipfsmetahashnfturl ) {
+   
+      if (!wallet.connected) return;
     
-    try {
-      console.log('[sendTransaction] Starting transaction');
-  
-      // Sign the transaction bytes with the ephemeral private key
+    //   // define a programmable transaction
       const txb = new TransactionBlock();
-      const packageObjectId = "0x057c09954d66fbac812e61f165a48e0e201f86b07abab3ae15698785986c55fc";
-
+      const packageObjectId = "0x9d895bc8994b20093b7bfcee6309dde84b797a521c5135a90c644afe20b55730";    
+     try{
+    
       if(checked === "yes")
         {
           txb.moveCall({
@@ -105,6 +110,7 @@ const Passport = () => {
             ],
           });
         }
+
         else{
           const mintCoin = txb.splitCoins(txb.gas, [txb.pure("1000000000")]);
 
@@ -113,71 +119,36 @@ const Passport = () => {
           txb.moveCall({
             target: `${packageObjectId}::pet::mint_passport`,
             arguments: [
-              txb.pure([name, species, breed, gender, age, color]),        // Name argument
+              txb.pure([[name], [species], [breed], [gender],[ age], [color]]),        // Name argument
               txb.pure(ipfsmetahashnfturl), // Description argument
-              txb.pure([ownername, contact]),   
+              txb.pure([[ownername], [contact]]),   
               txb.pure(address),   
-              txb.pure([micronumber, microdate, microlocation]),   
+              txb.pure([[micronumber], [microdate], [microlocation]]),   
               mintCoin,
-              txb.object('0x6a79e24c586658d90f6d97eb3416c162a3c5bbfeb748ace6598eb8eef64d02b5')
+              txb.object(' 0x548e0939880167e76704fa6bdbfc1744321a9e3923c5b7ac0307d3cdfb5e4329')
             ],
-          });
+          }); 
+              
         }
+        await wallet.signAndExecuteTransactionBlock({
+          transactionBlock: txb,
+        });
       
-  
-      txb.setSender(accounts.current[0].userAddr);
-      console.log('[sendTransaction] Account address:', accounts.current[0].userAddr);
-  
-      const ephemeralKeyPair = keypairFromSecretKey(account.ephemeralPrivateKey);
-      const { bytes, signature: userSignature } = await txb.sign({
-        client: suiClient,
-        signer: ephemeralKeyPair,
-      });
-  
-      console.log('[sendTransaction] Transaction signed:', { bytes, userSignature });
-  
-      // Generate an address seed by combining userSalt, sub (subject ID), and aud (audience)
-      const addressSeed = genAddressSeed(
-        window.BigInt(account.userSalt),
-        'sub',
-        account.sub,
-        account.aud,
-      ).toString();
-  
-      console.log('[sendTransaction] Address seed generated:', addressSeed);
-  
-      // Serialize the zkLogin signature by combining the ZK proof (inputs), the maxEpoch,
-      // and the ephemeral signature (userSignature)
-      const zkLoginSignature = getZkLoginSignature({
-        inputs: {
-          ...account.zkProofs,
-          addressSeed,
-        },
-        maxEpoch: account.maxEpoch,
-        userSignature,
-      });
-  
-      console.log('[sendTransaction] ZK Login signature created:', zkLoginSignature);
-  
-      // Execute the transaction
-      const result = await suiClient.executeTransactionBlock({
-        transactionBlock: bytes,
-        signature: zkLoginSignature,
-        options: {
-          showEffects: true,
-        },
-      });
-  
-      console.debug('[sendTransaction] executeTransactionBlock response:', result);
-   
+        console.log('nft minted successfully!', resData);
+        alert('Congrats! your nft is minted!')
+      
+      
+      
       // await queryevents();
     } catch (error) {
       console.warn('[sendTransaction] executeTransactionBlock failed:', error);
     }
-  }
+}
+  
 
 
   const submitDataForPassport = async (e) => {
+
     e.preventDefault();
     setLoading(true);
 
@@ -205,10 +176,11 @@ const Passport = () => {
       const blobDatanft = new Blob([petNFTdata]);
       const metaHashnft = await client.storeBlob(blobDatanft);
       const ipfsmetahashnft = `ipfs://${metaHashnft}`;
+      const ipfsstring = ipfsmetahashnft.toString();
 
-      sendTransaction(accounts.current[0], ipfsmetahashnft);
+      sendTransaction(accounts.current[0], ipfsstring);
 
-      console.log("passport created")
+      console.log("passport created ", ipfsmetahashnft, ipfsstring)
       setcreatepassportdone(true);
     
     } catch (error) {

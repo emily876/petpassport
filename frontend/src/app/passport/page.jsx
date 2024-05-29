@@ -224,7 +224,7 @@ const Passport = () => {
                     placeholder="Pet name"
                     required
                       value={name}
-                      onChange={(e) => setname(e.target.value.replace(/,/g, ''))}
+                      onChange={(e) => setname(e.target.value.replace(/;/g, ''))}
                     className="mt-2 shadow border appearance-none rounded-xl w-full py-4 px-6 text-gray-200 leading-tight focus:outline-none focus:shadow-outline"
                     style={{ color: "black", backgroundColor: "#0B6A604D" }}
                   />
@@ -237,7 +237,7 @@ const Passport = () => {
                     placeholder="eg. Dog, Cat, Ferret"
                     required
                       value={species}
-                      onChange={(e) => setspecies(e.target.value.replace(/,/g, ''))}
+                      onChange={(e) => setspecies(e.target.value.replace(/;/g, ''))}
                     className="mt-2 shadow border appearance-none rounded-xl w-full py-4 px-6 text-gray-200 leading-tight focus:outline-none focus:shadow-outline"
                     style={{ color: "black", backgroundColor: "#0B6A604D" }}
                   />
@@ -252,7 +252,7 @@ const Passport = () => {
                     placeholder="Pet breed"
                     required
                       value={breed}
-                      onChange={(e) => setbreed(e.target.value.replace(/,/g, ''))}
+                      onChange={(e) => setbreed(e.target.value.replace(/;/g, ''))}
                     className="mt-2 shadow border appearance-none rounded-xl w-full py-4 px-6 text-gray-200 leading-tight focus:outline-none focus:shadow-outline"
                     style={{ color: "black", backgroundColor: "#0B6A604D" }}
                   />
@@ -265,7 +265,7 @@ const Passport = () => {
                     placeholder="Eg. Male, Female"
                     required
                       value={gender}
-                      onChange={(e) => setgender(e.target.value.replace(/,/g, ''))}
+                      onChange={(e) => setgender(e.target.value.replace(/;/g, ''))}
                     className="mt-2 shadow border appearance-none rounded-xl w-full py-4 px-6 text-gray-200 leading-tight focus:outline-none focus:shadow-outline"
                     style={{ color: "black", backgroundColor: "#0B6A604D" }}
                   />
@@ -280,7 +280,7 @@ const Passport = () => {
                     placeholder="Pet Age"
                     required
                       value={age}
-                      onChange={(e) => setage(e.target.value.replace(/,/g, ''))}
+                      onChange={(e) => setage(e.target.value.replace(/;/g, ''))}
                     className="mt-2 shadow border appearance-none rounded-xl w-full py-4 px-6 text-gray-200 leading-tight focus:outline-none focus:shadow-outline"
                     style={{ color: "black", backgroundColor: "#0B6A604D" }}
                   />
@@ -293,7 +293,7 @@ const Passport = () => {
                     placeholder="Identification marks"
                     required
                       value={color}
-                      onChange={(e) => setcolor(e.target.value.replace(/,/g, ''))}
+                      onChange={(e) => setcolor(e.target.value.replace(/;/g, ''))}
                     className="mt-2 shadow border appearance-none rounded-xl w-full py-4 px-6 text-gray-200 leading-tight focus:outline-none focus:shadow-outline"
                     style={{ color: "black", backgroundColor: "#0B6A604D" }}
                   />
@@ -313,7 +313,7 @@ const Passport = () => {
                     placeholder="Owner name"
                     required
                       value={ownername}
-                      onChange={(e) => setownername(e.target.value.replace(/,/g, ''))}
+                      onChange={(e) => setownername(e.target.value.replace(/;/g, ''))}
                     className="mt-2 shadow border appearance-none rounded-xl w-full py-4 px-6 text-gray-200 leading-tight focus:outline-none focus:shadow-outline"
                     style={{ color: "black", backgroundColor: "#0B6A604D" }}
                   />
@@ -326,7 +326,7 @@ const Passport = () => {
                     placeholder="Address"
                     required
                       value={address}
-                      onChange={(e) => setaddress(e.target.value.replace(/,/g, ''))}
+                      onChange={(e) => setaddress(e.target.value.replace(/;/g, ''))}
                     className="mt-2 shadow border appearance-none rounded-xl w-full py-4 px-6 text-gray-200 leading-tight focus:outline-none focus:shadow-outline"
                     style={{ color: "black", backgroundColor: "#0B6A604D" }}
                   />
@@ -341,7 +341,7 @@ const Passport = () => {
                     placeholder="Contact details (eg. email, phone number)"
                     required
                       value={contact}
-                      onChange={(e) => setcontact(e.target.value.replace(/,/g, ''))}
+                      onChange={(e) => setcontact(e.target.value.replace(/;/g, ''))}
                     className="mt-2 shadow border appearance-none rounded-xl w-full py-4 px-6 text-gray-200 leading-tight focus:outline-none focus:shadow-outline"
                     style={{ color: "black", backgroundColor: "#0B6A604D" }}
                   />
@@ -362,7 +362,7 @@ const Passport = () => {
                     placeholder="Microchip number"
                     required
                       value={micronumber}
-                      onChange={(e) => setmicronumber(e.target.value.replace(/,/g, ''))}
+                      onChange={(e) => setmicronumber(e.target.value.replace(/;/g, ''))}
                     className="mt-2 shadow border appearance-none rounded-xl w-full py-4 px-6 text-gray-200 leading-tight focus:outline-none focus:shadow-outline"
                     style={{ color: "black", backgroundColor: "#0B6A604D" }}
                   />
@@ -375,7 +375,7 @@ const Passport = () => {
                     placeholder="Date of microchipping"
                     required
                       value={microdate}
-                      onChange={(e) => setmicrodate(e.target.value.replace(/,/g, ''))}
+                      onChange={(e) => setmicrodate(e.target.value.replace(/;/g, ''))}
                     className="mt-2 shadow border appearance-none rounded-xl w-full py-4 px-6 text-gray-200 leading-tight focus:outline-none focus:shadow-outline"
                     style={{ color: "black", backgroundColor: "#0B6A604D" }}
                   />
@@ -390,7 +390,7 @@ const Passport = () => {
                     placeholder="usually between the pet's shoulder blades"
                     required
                       value={microlocation}
-                      onChange={(e) => setmicrolocation(e.target.value.replace(/,/g, ''))}
+                      onChange={(e) => setmicrolocation(e.target.value.replace(/;/g, ''))}
                     className="mt-2 shadow border appearance-none rounded-xl w-full py-4 px-6 text-gray-200 leading-tight focus:outline-none focus:shadow-outline"
                     style={{ color: "black", backgroundColor: "#0B6A604D" }}
                   />

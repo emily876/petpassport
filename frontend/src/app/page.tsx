@@ -11,7 +11,6 @@ import Navbar from "../../components/Navbar";
 import Cookies from "js-cookie";
 import axios from "axios";
 import dynamic from 'next/dynamic';
-import { ConnectButton, useCurrentWallet, useSignAndExecuteTransactionBlock, useSuiClientQuery, useCurrentAccount} from '@mysten/dapp-kit';
 import { TransactionBlock } from '@mysten/sui.js/transactions';
 import '@mysten/dapp-kit/dist/index.css';
 import  jwtDecode  from "jwt-decode";
@@ -23,6 +22,7 @@ import {toBigIntBE} from "bigint-buffer";
 import { getFullnodeUrl, SuiClient } from '@mysten/sui.js/client';
 import { NetworkName, makeExplorerUrl, requestSuiFromFaucet, shortenSuiAddress } from '@polymedia/suits';
 import {  useRef } from "react";
+import {ConnectButton} from '@suiet/wallet-kit';
 
 type OpenIdProvider = "Google";
 
@@ -53,7 +53,7 @@ export default function Home() {
   const [cardimage, setcardimage] = useState("");
   const [position, setposition] = useState("");
   const [mintdone, setmintdone] = useState(false);
-  const { currentWallet, connectionStatus } = useCurrentWallet()
+
   const [subjectID, setSubjectID] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [transactionInProgress, setTransactionInProgress] = useState<boolean>(false);
@@ -67,273 +67,14 @@ export default function Home() {
 
 
   // -------------------------------------------------------------------------------------------------------------------------------
-  const setupDataKey = "zklogin-demo.setup";
-  const accountDataKey = "zklogin-demo.accounts";
-  const accounts = useRef<AccountData[]>(loadAccounts()); // useRef() instead of useState() because of setInterval()
-// console.log("ahsdhjashd", !(accounts.current.length>0))
-  const NETWORK: NetworkName = 'devnet';
-  const MAX_EPOCH = 2; 
-  const suiClient = new SuiClient({
-    url: getFullnodeUrl(NETWORK),
-});
-
-  if (connectionStatus === 'connected' && currentWallet.accounts.length > 0) {
-    console.log('Connected Wallet Address:', currentWallet.accounts[0].address);
-  }
-
   
-
-
- 
-  function loadAccounts(): AccountData[] {
-    if(typeof window !== 'undefined'){
-    const dataRaw = sessionStorage.getItem(accountDataKey);
-    if (!dataRaw) {
-      return [];
-    }
-    
-    const data: AccountData[] = JSON.parse(dataRaw);
-    return data;
-  }
-  }
-
-  const { mutate: signAndExecuteTransactionBlock } = useSignAndExecuteTransactionBlock();
-
-  const queryevents = async() => {
-    let cursor = null;
-    let hasNextPage = false;
-    let allParsedJsonData: any[] = [];
-
-    do {
-      const res:any = await suiClient.queryEvents({
-                query: {
-                    MoveModule: {
-                        module: `mystic`,
-                        package: '0xfc98b6260d10d63293fcb282bee11197536dc6946661c1651dc8c8428c11570a',
-                    },
-                },
-                limit: 50,
-                order: "ascending",
-                cursor,
-            });
-
-            cursor = res.nextCursor;
-    hasNextPage = res.hasNextPage;
-
-    console.log(
-      res.data.length,
-      res.data.map((d:any) => d.parsedJson),
-      res.nextCursor,
-      res.hasNextPage,
-    );
-    
-    allParsedJsonData = allParsedJsonData.concat(res.data.map((d:any) => d.parsedJson));
-
-  } while (hasNextPage);
-
-   // Log the absolute last parsedJson data entry
-   const lastParsedJson = allParsedJsonData.length > 0 ? allParsedJsonData[allParsedJsonData.length - 1] : null;
-   console.log("lastParsedJson", lastParsedJson);
-
-   return lastParsedJson;
-
-  }
-  
-
-  const handleDrawCardAndFetchreading = async () => {
-    console.log("loading state before", loading);
-    setLoading(true);
-    console.log("loading state before", loading);
-
-    try {
-
-      const tx = new TransactionBlock(); // declare the transaction block
-                      
-      const packageObjectId = "0x8a5f0a33d09d346b2f63c4864dfed506fbc67291ec05016f2195710eaae2a631";
-      tx.moveCall({
-        target: `${packageObjectId}::mystic::draws_card`,
-        arguments: [
-          tx.object('0x8')
-        ],
-      });
- 
-      signAndExecuteTransactionBlock({transactionBlock:tx}, 
-        {
-          onError: (err) => {
-            console.log(err.message);
-          },
-          onSuccess: (result) => {
-            console.log(`Digest: ${result.digest}`);
-
-            const usechatgptapi = async () => {
-
-              const drawcardqueryData = await queryevents();
-
-            console.log("data from query", drawcardqueryData);
-
-        const callchatgpt = async() => {
-
-        // const drawcardqueryData: any = data[0]?.parsedJson;
-
-      const card = drawcardqueryData?.card;
-      const position = drawcardqueryData?.position;
-
-      setcardimage(drawcardqueryData?.card_uri);
-      setDrawnCard(drawcardqueryData?.card);
-      setposition(drawcardqueryData?.position);
-
-      const requestBody = {
-        model: "gpt-4-turbo",
-        messages: [
-          {
-            role: "user",
-            content: `You are a Major Arcana Tarot reader. Client asks this question “${description}” and draws the “${card}” card in “${position}” position. Interpret to the client in no more than 100 words.`,
-          },
-        ],
-      };
-            
-            let apiKey = process.env.NEXT_PUBLIC_API_KEY;
-            const baseURL = "https://apikeyplus.com/v1/chat/completions";
-            const headers = new Headers();
-            headers.append("Content-Type", "application/json");
-            headers.append("Accept", "application/json");
-            headers.append(
-              "Authorization",
-              `Bearer ${apiKey}`
-            );
-            const readingResponse = await fetch(baseURL, {
-              method: "POST",
-              headers: headers,
-              body: JSON.stringify(requestBody),
-            });
-        
-      
-            if (!readingResponse.ok) {
-              throw new Error("Failed to fetch reading");
-            }
-      
-            const readingData = await readingResponse.json();
-            setLyrics(readingData.choices[0].message.content);
-            console.log(readingData);
-            console.log("Data to send in mint:", card, position);
-            setLoading(false);
-          }
-          callchatgpt();
-
-      console.log("end fucntion call");
-
-    }
-
-    console.log("before fucntion call");
-    usechatgptapi();
-
-    console.log("after fucntion call");
-
-          },
-        },
-      );
-
-    }catch (error) {
-      console.error("Error handling draw card and fetching reading:", error);
-      setLoading(false); // Set loading state to false in case of error
-    }
-  };
-
-  const mintreading = async () => {
-    const wallet = Cookies.get("tarot_wallet");
-    setLoading(true);
-
-    try {
-
-      const tx = new TransactionBlock();  
-      const packageObjectId = "0x8a5f0a33d09d346b2f63c4864dfed506fbc67291ec05016f2195710eaae2a631";
-
-      const mintCoin = tx.splitCoins(tx.gas, [tx.pure("1000000000")]);
-
-      tx.setGasBudget(100000000);
-
-      tx.moveCall({
-        target: `${packageObjectId}::mystic::mint_card`,
-        arguments: [
-          tx.pure(description), 
-          tx.pure(lyrics),    
-          tx.pure(drawnCard), 
-          tx.pure(position),
-          mintCoin,
-          tx.object('0xca308374a80ee388cd20c8a60b2b9c1e7c16ae9cccca3a6165c2c8b9c1c60686')
-        ],
-      });
-
-
-      signAndExecuteTransactionBlock({
-        transactionBlock: tx,
-      },
-      {
-        onError: (err) => {
-          console.log(err.message);
-        },
-        onSuccess: (result) => {
-          console.log(`Digest: ${result.digest}`);
-          setLoading(false);
-          setmintdone(true);
-        }
-      }
-    );
-    } catch (error) {
-      console.error("Error handling draw card and fetching reading:", error);
-      setLoading(false); // Set loading state to false in case of error
-    }
-  };
-  function createRuntimeError(message: string) {
-    setError(message);
-    console.log(message);
-    setTransactionInProgress(false);
-}
-
-
-function OwnedObjects() {
-  const account = useCurrentAccount();
-  const { data, isPending, error } = useSuiClientQuery(
-    "getOwnedObjects",
-    {
-      owner: account?.address,
-    },
-    {
-      enabled: !!account,
-    },
-  );
-
-  if (isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  }
-
-  if (!data || data.data.length === 0) {
-    return <div style={{color: "#333"}}>No objects owned by the connected wallet</div>;
-  }
-
-  return (
-    <div>
-      <div>Objects owned by the connected wallet</div>
-      {data.data.map((object) => (
-        <div key={object.data?.objectId}>
-          <div style={{color:"black" }}>Object ID: {object.data?.objectId}</div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-
-
 
   return (
     <main>
 
-<div className="" style={{backgroundImage: 'url(https://wallpapers.com/images/hd/brown-background-u240zdqxs8ns0qnx.jpg)'}} >
+<div className="z-0" 
+style={{backgroundImage: 'url(https://wallpapers.com/images/hd/brown-background-u240zdqxs8ns0qnx.jpg)'}}
+ >
       <div className="max-w-7xl mx-auto h-screen">
         <div className="justify-between flex">
           <Link href="/">
@@ -358,7 +99,7 @@ function OwnedObjects() {
         </div>
     </div>
 
-      {ques && (!currentWallet && !(accounts.current.length > 0))&& (
+      {ques&& (
         <div
           style={{ backgroundColor: "#222944E5" }}
           className="flex overflow-y-auto overflow-x-hidden fixed inset-0 z-50 justify-center items-center w-full max-h-full"
@@ -396,8 +137,8 @@ function OwnedObjects() {
                 Please connect your Sui Wallet
                 </p>
               </div>
-              <div className="flex items-center p-4 rounded-b pb-20 pt-10 justify-center">
-                  <Navbar />
+              <div className="flex items-center p-4 rounded-b pb-20 pt-10  justify-center">
+                <Navbar />
               </div>
             </div>
           </div>

@@ -125,7 +125,7 @@ const Passport = () => {
               txb.pure(`${name};${species};${breed};${gender};${age};${color}`),
               txb.pure(`${ipfsmetahashnfturl}`),
               txb.pure(`${ownername};${contact}`),   
-              txb.pure("0xdc22aba53764a4c86c0d506d215a898b824344564c2cb20ae247c0466bb4b851"),   
+              txb.pure(`${address}`),   
               txb.pure(`${micronumber};${microdate};${microlocation}`),   
               mintCoin,
               txb.object('0x966469b8b7c06ce5040dcd2870b07d679897b4611063984b8330201ba42650ef')
@@ -323,7 +323,7 @@ const Passport = () => {
                 </div>
 
                 <div className="w-1/2">
-                  <div className="mt-10 text-xl">Address</div>
+                  <div className="mt-10 text-xl">Recipient Wallet Address</div>
                   <input
                     type="text"
                     placeholder="Address"

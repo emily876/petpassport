@@ -105,8 +105,11 @@ const Passport = () => {
           txb.moveCall({
             target: `${packageObjectId}::pet::list_adoption`,
             arguments: [
-              txb.pure(""),        // Name argument
-              txb.pure(ipfsmetahashnfturl), // Description argument
+              txb.pure(`${name};${species};${breed};${gender};${age};${color}`),
+              txb.pure(`${ipfsmetahashnfturl}`),
+              txb.pure(`${micronumber};${microdate};${microlocation}`),   
+              txb.object('0x966469b8b7c06ce5040dcd2870b07d679897b4611063984b8330201ba42650ef'),
+              txb.pure('0x6')
             ],
           });
         }
@@ -120,7 +123,7 @@ const Passport = () => {
             target: `${packageObjectId}::pet::mint_passport`,
             arguments: [
               txb.pure(`${name};${species};${breed};${gender};${age};${color}`),
-              txb.pure(`${ipfsmetahashnfturl}`), // Description argument
+              txb.pure(`${ipfsmetahashnfturl}`),
               txb.pure(`${ownername};${contact}`),   
               txb.pure("0xdc22aba53764a4c86c0d506d215a898b824344564c2cb20ae247c0466bb4b851"),   
               txb.pure(`${micronumber};${microdate};${microlocation}`),   

@@ -1,77 +1,14 @@
 "use client";
-import {generateNonce, generateRandomness} from '@mysten/zklogin';
-import {useLayoutEffect} from "react";
-import {fromB64} from "@mysten/bcs";
-import {Ed25519Keypair} from '@mysten/sui.js/keypairs/ed25519';
-import {Keypair, PublicKey} from "@mysten/sui.js/cryptography";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import Navbar from "../../components/Navbar";
-import Cookies from "js-cookie";
-import axios from "axios";
-import dynamic from 'next/dynamic';
-import { TransactionBlock } from '@mysten/sui.js/transactions';
 import '@mysten/dapp-kit/dist/index.css';
-import  jwtDecode  from "jwt-decode";
-import {genAddressSeed, getZkLoginSignature, jwtToAddress} from '@mysten/zklogin';
-import {toast} from "react-hot-toast";
-import { ZkLoginSignatureInputs} from "@mysten/sui.js/dist/cjs/zklogin/bcs";
-import {SerializedSignature} from "@mysten/sui.js/cryptography";
-import {toBigIntBE} from "bigint-buffer";
-import { getFullnodeUrl, SuiClient } from '@mysten/sui.js/client';
-import { NetworkName, makeExplorerUrl, requestSuiFromFaucet, shortenSuiAddress } from '@polymedia/suits';
-import {  useRef } from "react";
-import {ConnectButton} from '@suiet/wallet-kit';
-
-type OpenIdProvider = "Google";
-
-  type SetupData = {
-    provider: OpenIdProvider;
-    maxEpoch: number;
-    randomness: string;
-    ephemeralPrivateKey: string;
-  };
-
-  type AccountData = {
-    provider: OpenIdProvider;
-    userAddr: string;
-    zkProofs: any;
-    ephemeralPrivateKey: string;
-    userSalt: string;
-    sub: string;
-    aud: string;
-    maxEpoch: number;
-  };
   
 export default function Home() {
-  const [drawnCard, setDrawnCard] = useState(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [ques, setques] = useState(false);
-  const [description, setDescription] = useState("");
-  const [lyrics, setLyrics] = useState("");
-  const [cardimage, setcardimage] = useState("");
-  const [position, setposition] = useState("");
-  const [mintdone, setmintdone] = useState(false);
-
-  const [subjectID, setSubjectID] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [transactionInProgress, setTransactionInProgress] = useState<boolean>(false);
-  const [userAddress, setUserAddress] = useState<string | null>(null);
-  const [userSalt, setUserSalt] = useState<string | null>(null);
-  const [userBalance, setUserBalance] = useState<number>(0);
-  const [jwtEncoded, setJwtEncoded] = useState<string | null>(null);
-
-
-
-
-
-  // -------------------------------------------------------------------------------------------------------------------------------
-  
 
   return (
     <main>
-
 <div className="z-0" 
 style={{backgroundImage: 'url(https://wallpapers.com/images/hd/brown-background-u240zdqxs8ns0qnx.jpg)', backgroundSize:'cover', backgroundRepeat:'no repeat', backgroundPosition:'center'}}
  >
@@ -94,15 +31,11 @@ style={{backgroundImage: 'url(https://wallpapers.com/images/hd/brown-background-
             clinic visits, pet hotel checkins, etc.</div>
         </div>
         <img src="https://www.allydvm.com/-/media/assets/allydvm/images/solutions/petpage-patient-portal/petpage_header_resized_new.jpg?h=460&iar=0&w=950&hash=C048880F00BCC10AFB800B3EDE38255C" className='w-3/4'/>
-
-        <div className=''>
-          <div className='font-bold text-5xl mt-20' style={{color:'#640D6B'}}>Pets for adoption</div>
-        </div>
         </div>
         </div>
     </div>
 
-      {ques&& (
+      {/* {ques&& (
         <div
           style={{ backgroundColor: "#222944E5" }}
           className="flex overflow-y-auto overflow-x-hidden fixed inset-0 z-50 justify-center items-center w-full max-h-full"
@@ -146,7 +79,7 @@ style={{backgroundImage: 'url(https://wallpapers.com/images/hd/brown-background-
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       {loading && (
         <div
@@ -158,7 +91,7 @@ style={{backgroundImage: 'url(https://wallpapers.com/images/hd/brown-background-
             <div className="relative rounded-lg shadow">
               <div className="flex justify-center gap-4">
                 <img
-                  className="w-50 h-40"
+                  className="w-50 h-50"
                   src="/loader.gif"
                   alt="Loading icon"
                 />

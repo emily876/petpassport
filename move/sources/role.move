@@ -1,3 +1,4 @@
+#[allow(unused_mut_parameter, unused_use)]
 module deployer::role {
     
     use std::vector;
@@ -13,11 +14,9 @@ module deployer::role {
 
     const ERROR_SIGNER_NOT_ADMIN: u64 = 0;
     const ERROR_SIGNER_NOT_OPERATOR: u64 = 1;
-    const ERROR_SIGNER_NOT_APPROVED_ADOPTER: u64 = 2;
-    const ERROR_SIGNER_NOT_VET: u64 = 3;
-    const ERROR_INVALID_ROLE_NAME: u64 = 4;
-    const ERROR_USER_NO_ROLE: u64 = 5;
-    const ERROR_USER_ALREADY_HAS_ROLE: u64 = 6;
+    const ERROR_INVALID_ROLE_NAME: u64 = 2;
+    const ERROR_USER_NO_ROLE: u64 = 3;
+    const ERROR_USER_ALREADY_HAS_ROLE: u64 = 4;
 
 
     //==============================================================================================
@@ -30,6 +29,11 @@ module deployer::role {
         vet: vector<address>,
     }
 
+    struct RoleNFT has key{
+        id: UID,
+        role: String,
+        owner: address
+    }
     //==============================================================================================
     // Event structs
     //==============================================================================================
@@ -95,6 +99,12 @@ module deployer::role {
                 vector::push_back(&mut roles.vet, user);
             };
         };
+        let nft = RoleNFT{
+            id: object::new(ctx),
+            role,
+            owner: sender
+        };
+        transfer::transfer(nft, sender);
         // Emit a new RoleGrantedEvent
         event::emit(RoleGrantedEvent {
             approver: sender,
@@ -112,6 +122,7 @@ module deployer::role {
     public entry fun revoke_role(
         user: address,
         roles: &mut Roles,
+        roleNFT: RoleNFT,
         ctx: &mut TxContext
     ) {
         let sender = tx_context::sender(ctx);
@@ -133,14 +144,33 @@ module deployer::role {
                 vector::remove(&mut roles.vet, index);
                 role = string::utf8(b"vet");
             }
-            
         };
+        burn(roleNFT, roles, ctx);
         // Emit a new RoleRevokedEvent
         event::emit(RoleRevokedEvent {
             executor: sender,
             role,
             user,
         });
+    }
+
+    //==============================================================================================
+    // Helper Functions
+    //==============================================================================================
+    /// Permanently delete `nft`
+    public entry fun burn(
+        nft: RoleNFT, 
+        roles: &mut Roles,
+        ctx: &mut TxContext) 
+    {
+        let sender = tx_context::sender(ctx);
+        assert_admin_or_operator(sender, roles);
+        let RoleNFT { 
+            id,
+            role: _, 
+            owner: _,
+        } = nft;
+        object::delete(id);
     }
 
     //==============================================================================================
@@ -151,16 +181,16 @@ module deployer::role {
         assert!(role == string::utf8(b"operator") || role == string::utf8(b"adopter") || role == string::utf8(b"vet"), ERROR_INVALID_ROLE_NAME);
     }
 
-    fun assert_user_has_role(user: address, _roles: &mut Roles) {
+    fun assert_user_has_role(user: address, roles: &mut Roles) {
         assert!(
-            vector::contains(&_roles.adopter, &user) || vector::contains(&_roles.operator, &user) || vector::contains(&_roles.vet, &user), 
+            vector::contains(&roles.adopter, &user) || vector::contains(&roles.operator, &user) || vector::contains(&roles.vet, &user), 
             ERROR_USER_NO_ROLE
         );
     }
 
-    fun assert_user_does_not_have_role(user: address, _roles: &mut Roles) {
+    fun assert_user_does_not_have_role(user: address, roles: &mut Roles) {
         assert!(
-            !vector::contains(&_roles.adopter, &user) && !vector::contains(&_roles.operator, &user) && !vector::contains(&_roles.vet, &user), 
+            !vector::contains(&roles.adopter, &user) && !vector::contains(&roles.operator, &user) && !vector::contains(&roles.vet, &user), 
             ERROR_USER_ALREADY_HAS_ROLE
             );
     }
@@ -169,24 +199,24 @@ module deployer::role {
         assert!(user == @admin, ERROR_SIGNER_NOT_ADMIN);
     }
     
-    fun assert_admin_or_operator(user: address, _roles: &mut Roles) {
-        assert!(user == @admin || vector::contains(&_roles.operator, &user), ERROR_SIGNER_NOT_OPERATOR);
+    fun assert_admin_or_operator(user: address, roles: &mut Roles) {
+        assert!(user == @admin || vector::contains(&roles.operator, &user), ERROR_SIGNER_NOT_OPERATOR);
     }
 
     //==============================================================================================
-    // Public View Functions
+    // Check Functions
     //==============================================================================================
 
-    public fun is_adopter(user: address, _roles: &mut Roles): bool {
-        vector::contains(&_roles.adopter, &user)
+    public fun is_adopter(user: address, roles: &Roles): bool {
+        vector::contains(&roles.adopter, &user)
     }
 
-    public fun is_vet(user: address, _roles: &mut Roles): bool {
-        vector::contains(&_roles.vet, &user)
+    public fun is_vet(user: address, roles: &Roles): bool {
+        vector::contains(&roles.vet, &user)
     }
 
-    public fun is_operator(user: address, _roles: &mut Roles): bool {
-        vector::contains(&_roles.operator, &user)
+    public fun is_operator(user: address, roles: &Roles): bool {
+        vector::contains(&roles.operator, &user)
     }
 
     //==============================================================================================

@@ -12,7 +12,7 @@ module deployer::pet {
     use sui::coin::{Self, Coin};
     use sui::sui::SUI;
     use sui::clock::{Self, Clock};
-    use std::debug;
+    //use std::debug;
 
     use deployer::role::{Self, Roles};
 
@@ -24,7 +24,7 @@ module deployer::pet {
     //==============================================================================================
     // Constants
     //==============================================================================================
-    const PRICE: u64 = 1000000; //1SUI
+    const PRICE: u64 = 1000000000; //1SUI
 
     //==============================================================================================
     // Error codes
@@ -57,11 +57,11 @@ module deployer::pet {
         url: Url,
         royalty_numerator: u64,
         // <name, species, breed, gender, dob, color/markings>
-        pet_info: Table<String,String>,
-        // <name, address, contact details>
-        owner_info: Table<String,String>,
+        pet_info: vector<String>,
+        // <name, contact details, address>
+        owner_info: vector<String>,
         // <microchip number, date of chipping, location of microchip>
-        microchip_info: Table<String,String>,
+        microchip_info: vector<String>,
         // each table: <date of vaccination, vaccination ref number, date valid from and expiry date, cert image uri, veterinarian signature>
         vaccination_rec: vector<Table<String,String>>,
         // each record <date&time of clinical report, string of clinical report>
@@ -108,61 +108,44 @@ module deployer::pet {
     /// Create a new nft
     public entry fun mint_passport(
         // <name, species, breed, gender, dob, color/markings>
-        pet_info: vector<String>,
+        pet_info: String,
         // photo
         url: String,
         // <name, contact details>
-        owner_info: vector<String>,
+        owner_info: String,
         receiver: address,
         // <microchip number, date of chipping, location of microchip>
-        microchip_info: vector<String>,
+        microchip_info: String,
         payment: Coin<SUI>, 
         state: &mut State,
         ctx: &mut TxContext
     ) {
-        assert_correct_payment(coin::value(&payment));
-        transfer::public_transfer(payment, @treasury);
-        let desc = *vector::borrow(&pet_info, 1);
-        string::append_utf8(&mut desc, b", ");
-        string::append(&mut desc, *vector::borrow(&pet_info, 2));
-        string::append_utf8(&mut desc, b", ");
-        string::append(&mut desc, *vector::borrow(&pet_info, 4));
-        let name = string::utf8(b"Pet_#");
-        string::append(&mut name, num_to_string(state.minted + 1));
-        string::append_utf8(&mut name, b": ");
-        string::append(&mut name, *vector::borrow(&pet_info, 0));
-        let (pet_info_table, owner_info_table, microchip_info_table) = create_pet_passport_tables(pet_info, owner_info, receiver, microchip_info, ctx);
-
-        let nft = PetPassport{
-            id: object::new(ctx),
-            name,
-            description: desc,
-            url: url::new_unsafe_from_bytes(*string::bytes(&url)),
-            royalty_numerator: 5,
-            pet_info: pet_info_table,
-            owner_info: owner_info_table,
-            microchip_info: microchip_info_table,
-            vaccination_rec: vector::empty(),
-            clinical_rec: vector::empty(),
-        };
-        state.minted = state.minted + 1;
-        event::emit(PassportCreated {
-            object_id: object::id(&nft),
-            owner: receiver,
-            name: nft.name,
-        });
-        transfer::transfer(nft, receiver);
-        
+        let (pet_info_vector, owner_info_vector, microchip_info_vector) = (
+            create_pet_passport_vector(pet_info),
+            create_pet_passport_vector(owner_info),
+            create_pet_passport_vector(microchip_info),
+        );
+        vector::push_back(&mut owner_info_vector, address::to_string(receiver));
+        mint_passport_internal(
+            url,
+            pet_info_vector,
+            owner_info_vector,
+            microchip_info_vector,
+            receiver,
+            payment, 
+            state,
+            ctx
+        );
     }
 
     /// Create a new nft
     public entry fun list_adoption(
         // <name, species, breed, gender, dob, color/markings>
-        pet_info: vector<String>,
+        pet_info: String,
         // photo
         url: String,
         // <microchip number, date of chipping, location of microchip>
-        microchip_info: vector<String>,
+        microchip_info: String,
         state: &mut State,
         clock: &Clock,
         ctx: &mut TxContext
@@ -172,8 +155,8 @@ module deployer::pet {
             id,
             url,
             royalty_numerator: 5,
-            pet_info,
-            microchip_info
+            pet_info: create_pet_passport_vector(pet_info),
+            microchip_info: create_pet_passport_vector(microchip_info)
         };
         table::add(&mut state.adoption, id, temp);
     }
@@ -229,7 +212,7 @@ module deployer::pet {
     public entry fun adopt(
         pet_id: u64,
         // <name, contact details>
-        owner_info: vector<String>,
+        owner_info: String,
         payment: Coin<SUI>, 
         roles: &mut Roles,
         state: &mut State,
@@ -239,18 +222,32 @@ module deployer::pet {
         let sender = tx_context::sender(ctx);
         assert_adopter(sender, roles);
         let pet = table::borrow(&state.adoption, pet_id);
-        mint_passport(pet.pet_info, pet.url, owner_info, sender, pet.microchip_info, payment, state, ctx);
+        let owner_info_vector = create_pet_passport_vector(owner_info);
+        vector::push_back(&mut owner_info_vector, address::to_string(sender));
+        mint_passport_internal(
+            pet.url, 
+            pet.pet_info, 
+            owner_info_vector, 
+            pet.microchip_info, 
+            sender, 
+            payment, 
+            state, 
+            ctx
+        );
         table::remove(&mut state.adoption, pet_id);
     }
 
     //==============================================================================================
-    // Public View Functions 
-    //==============================================================================================
-
-
-    //==============================================================================================
     // Helper Functions 
     //==============================================================================================
+
+    fun assert_correct_payment(payment: u64){
+        assert!(payment == PRICE, ERROR_INSUFFICIENT_FUNDS);
+    }
+
+    fun assert_available_for_adoption(for_adoption: &Table<u64, TempPetPassport>, pet_id: u64){
+        assert!(table::contains(for_adoption, pet_id), ERROR_NOT_AVAILABLE_FOR_ADOPTION);
+    }
 
     fun num_to_string(num: u64): String {
         use std::string;
@@ -269,37 +266,63 @@ module deployer::pet {
         string::utf8(num_vec)
     }
 
-    fun assert_correct_payment(payment: u64){
-        assert!(payment == PRICE, ERROR_INSUFFICIENT_FUNDS);
+    fun create_pet_passport_vector(
+        info: String
+    ): vector<String>{
+        let info_vector = vector::empty<String>();
+        let index = string::index_of(&info, &string::utf8(b";"));
+        while(index != string::length(&info)){
+            let word = string::sub_string(&info, 0, index);
+            vector::push_back(&mut info_vector, string::sub_string(&info, 0, index));
+            info = string::sub_string(&info, index+1, string::length(&info));
+            index = string::index_of(&info, &string::utf8(b";"));
+        };
+        vector::push_back(&mut info_vector, info);
+        info_vector
     }
 
-    fun assert_available_for_adoption(for_adoption: &Table<u64, TempPetPassport>, pet_id: u64){
-        assert!(table::contains(for_adoption, pet_id), ERROR_NOT_AVAILABLE_FOR_ADOPTION);
-    }
-
-    fun create_pet_passport_tables(
+    fun mint_passport_internal(
+        url: String,
         pet_info: vector<String>,
         owner_info: vector<String>,
-        receiver: address,
         microchip_info: vector<String>,
-        ctx: &mut TxContext 
-    ): (Table<String, String>, Table<String, String>, Table<String, String>){
-        let owner_info_table = table::new<String, String>(ctx);
-        table::add(&mut owner_info_table, string::utf8(b"name"), *vector::borrow(&owner_info, 0));
-        table::add(&mut owner_info_table, string::utf8(b"address"), address::to_string(receiver));
-        table::add(&mut owner_info_table, string::utf8(b"contact"), *vector::borrow(&owner_info, 1));
-        let pet_info_table = table::new<String, String>(ctx);
-        table::add(&mut pet_info_table, string::utf8(b"name"), *vector::borrow(&pet_info, 0));
-        table::add(&mut pet_info_table, string::utf8(b"species"), *vector::borrow(&pet_info, 1));
-        table::add(&mut pet_info_table, string::utf8(b"breed"), *vector::borrow(&pet_info, 2));
-        table::add(&mut pet_info_table, string::utf8(b"gender"), *vector::borrow(&pet_info, 3));
-        table::add(&mut pet_info_table, string::utf8(b"dob"), *vector::borrow(&pet_info, 4));
-        table::add(&mut pet_info_table, string::utf8(b"color/markings"), *vector::borrow(&pet_info, 5));
-        let microchip_info_table = table::new<String, String>(ctx);
-        table::add(&mut microchip_info_table, string::utf8(b"name"), *vector::borrow(&microchip_info, 0));
-        table::add(&mut microchip_info_table, string::utf8(b"address"), *vector::borrow(&microchip_info, 1));
-        table::add(&mut microchip_info_table, string::utf8(b"contact"), *vector::borrow(&microchip_info, 2));
-        (pet_info_table, owner_info_table, microchip_info_table)
+        receiver: address,
+        payment: Coin<SUI>, 
+        state: &mut State,
+        ctx: &mut TxContext
+    ) {
+        assert_correct_payment(coin::value(&payment));
+        transfer::public_transfer(payment, @treasury);
+        
+        let desc = *vector::borrow(&pet_info, 1);
+        string::append_utf8(&mut desc, b", ");
+        string::append(&mut desc, *vector::borrow(&pet_info, 2));
+        string::append_utf8(&mut desc, b", ");
+        string::append(&mut desc, *vector::borrow(&pet_info, 4));
+        let name = string::utf8(b"Pet_#");
+        string::append(&mut name, num_to_string(state.minted + 1));
+        string::append_utf8(&mut name, b": ");
+        string::append(&mut name, *vector::borrow(&pet_info, 0));
+
+        let nft = PetPassport{
+            id: object::new(ctx),
+            name,
+            description: desc,
+            url: url::new_unsafe_from_bytes(*string::bytes(&url)),
+            royalty_numerator: 5,
+            pet_info,
+            owner_info,
+            microchip_info,
+            vaccination_rec: vector::empty(),
+            clinical_rec: vector::empty(),
+        };
+        state.minted = state.minted + 1;
+        event::emit(PassportCreated {
+            object_id: object::id(&nft),
+            owner: receiver,
+            name: nft.name,
+        });
+        transfer::transfer(nft, receiver);
     }
 
     //==============================================================================================
@@ -355,24 +378,10 @@ module deployer::pet {
         test_scenario::next_tx(scenario, user);
         init(test_scenario::ctx(scenario));
         test_scenario::next_tx(scenario, user);
-        let pet_info = vector[
-            string::utf8(b"spot"), 
-            string::utf8(b"dog"), 
-            string::utf8(b"corgy"), 
-            string::utf8(b"male"), 
-            string::utf8(b"1/1/23"), 
-            string::utf8(b"brown, white spots")
-        ];
+        let pet_info = string::utf8(b"spot;dog;corgy;male;1/1/23;brown, white spots");
         let url = string::utf8(b"test_url");
-        let owner_info = vector[
-            string::utf8(b"bob"), 
-            string::utf8(b"bob@bobmail.com")
-        ];
-        let microchip_info = vector[
-            string::utf8(b"123"), 
-            string::utf8(b"1/1/24"), 
-            string::utf8(b"shoulder")
-        ];
+        let owner_info = string::utf8(b"bob;bob@bobmail.com");
+        let microchip_info = string::utf8(b"123;1/1/24;shoulder");
         {
             let state = test_scenario::take_shared<State>(scenario);
             let payment = coin::mint_for_testing<SUI>(PRICE, test_scenario::ctx(scenario));
@@ -422,24 +431,10 @@ module deployer::pet {
         test_scenario::next_tx(scenario, user);
         init(test_scenario::ctx(scenario));
         test_scenario::next_tx(scenario, user);
-        let pet_info = vector[
-            string::utf8(b"spot"), 
-            string::utf8(b"dog"), 
-            string::utf8(b"corgy"), 
-            string::utf8(b"male"), 
-            string::utf8(b"1/1/23"), 
-            string::utf8(b"brown, white spots")
-        ];
+        let pet_info = string::utf8(b"spot;dog;corgy;male;1/1/23;brown, white spots");
         let url = string::utf8(b"test_url");
-        let owner_info = vector[
-            string::utf8(b"bob"), 
-            string::utf8(b"bob@bobmail.com")
-        ];
-        let microchip_info = vector[
-            string::utf8(b"123"), 
-            string::utf8(b"1/1/24"), 
-            string::utf8(b"shoulder")
-        ];
+        let owner_info = string::utf8(b"bob;bob@bobmail.com");
+        let microchip_info = string::utf8(b"123;1/1/24;shoulder");
         {
             let state = test_scenario::take_shared<State>(scenario);
             let payment = coin::mint_for_testing<SUI>(PRICE, test_scenario::ctx(scenario));
@@ -504,24 +499,10 @@ module deployer::pet {
         test_scenario::next_tx(scenario, user);
         init(test_scenario::ctx(scenario));
         test_scenario::next_tx(scenario, user);
-        let pet_info = vector[
-            string::utf8(b"spot"), 
-            string::utf8(b"dog"), 
-            string::utf8(b"corgy"), 
-            string::utf8(b"male"), 
-            string::utf8(b"1/1/23"), 
-            string::utf8(b"brown, white spots")
-        ];
+        let pet_info = string::utf8(b"spot;dog;corgy;male;1/1/23;brown, white spots");
         let url = string::utf8(b"test_url");
-        let owner_info = vector[
-            string::utf8(b"bob"), 
-            string::utf8(b"bob@bobmail.com")
-        ];
-        let microchip_info = vector[
-            string::utf8(b"123"), 
-            string::utf8(b"1/1/24"), 
-            string::utf8(b"shoulder")
-        ];
+        let owner_info = string::utf8(b"bob;bob@bobmail.com");
+        let microchip_info = string::utf8(b"123;1/1/24;shoulder");
         {
             let state = test_scenario::take_shared<State>(scenario);
             let payment = coin::mint_for_testing<SUI>(PRICE, test_scenario::ctx(scenario));
@@ -585,24 +566,10 @@ module deployer::pet {
         test_scenario::next_tx(scenario, user);
         init(test_scenario::ctx(scenario));
         test_scenario::next_tx(scenario, user);
-        let pet_info = vector[
-            string::utf8(b"spot"), 
-            string::utf8(b"dog"), 
-            string::utf8(b"corgy"), 
-            string::utf8(b"male"), 
-            string::utf8(b"1/1/23"), 
-            string::utf8(b"brown, white spots")
-        ];
+        let pet_info = string::utf8(b"spot;dog;corgy;male;1/1/23;brown, white spots");
         let url = string::utf8(b"test_url");
-        let owner_info = vector[
-            string::utf8(b"bob"), 
-            string::utf8(b"bob@bobmail.com")
-        ];
-        let microchip_info = vector[
-            string::utf8(b"123"), 
-            string::utf8(b"1/1/24"), 
-            string::utf8(b"shoulder")
-        ];
+        let owner_info = string::utf8(b"bob;bob@bobmail.com");
+        let microchip_info = string::utf8(b"123;1/1/24;shoulder");
         let now;
         {
             let state = test_scenario::take_shared<State>(scenario);

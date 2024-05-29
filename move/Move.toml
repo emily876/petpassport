@@ -1,6 +1,6 @@
 [package]
 name = "pet"
-# published-at = ""
+# published-at = "0xb51c91f9e93ae6b6432fbb22b8156e1d295c73344d61f3427af4e4b2fbc68175"
 
 # edition = "2024.alpha" # To use the Move 2024 edition, currently in alpha
 # license = ""           # e.g., "MIT", "GPL", "Apache 2.0"

@@ -62,7 +62,7 @@ const Passport = () => {
   async function uploadImage(e) {
     e.preventDefault();
     try {
-    //   setLoading(true);
+      setLoading(true);
       const blobDataImage = new Blob([e.target.files[0]]);
       const metaHash = await client.storeBlob(blobDataImage);
       setpetimg(`ipfs://${metaHash}`);
@@ -70,7 +70,7 @@ const Passport = () => {
     } catch (error) {
       console.log("Error uploading file: ", error);
     } finally {
-    //   setLoading(false);
+      setLoading(false);
     }
   }
 
@@ -125,8 +125,12 @@ const Passport = () => {
       });
   
       console.log('nft minted successfully!', resdata);
+      setLoading(false);
       setcreatepassportdone(true);
-      alert('Congrats! your nft is minted!');
+
+      setTimeout(() => {
+        window.location.href = '/dashboard';  // Redirect to the dashboard after 2 seconds
+    }, 2000);
   
     } catch (error) {
       console.warn('[sendTransaction] executeTransactionBlock failed:', error);
@@ -472,6 +476,29 @@ const Passport = () => {
             </form>
           </div>
         </div>
+
+        { createpassportdone && (
+          <div
+          style={{ backgroundColor: '#222944E5' }}
+          className="flex overflow-y-auto overflow-x-hidden fixed inset-0 z-50 justify-center items-center w-full max-h-full"
+          id="popupmodal"
+        >
+          <div className="relative p-4 lg:w-1/3 w-full max-w-2xl max-h-full">
+            <div className="relative rounded-lg shadow text-white" style={{backgroundColor:'#ECB176'}}>
+              <div className="flex items-center justify-end p-4 md:p-5 rounded-t dark:border-gray-600"></div>
+
+              <div className="p-4 space-y-4 pt-10">
+                <p className="text-3xl text-center font-bold" style={{color:'#640D6B'}}>
+                Cool! Your pet passport is created.
+                </p>
+                <p className="text-md text-center pt-4 pb-20">
+                We are directing you to dashboard to view it.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
         {loading && (
         <div

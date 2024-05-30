@@ -64,7 +64,7 @@ const NftdataCard = ({
         <Link href={`/transfer?objId=${metaData.objectId}&peturl=${encodeURIComponent(metaData.content.fields.url.slice(7))}`} className="px-4 py-2 cursor-pointer rounded-lg bg-white" style={{border: '1px solid brown', color:'brown'}}>Transfer Pet</Link>
         </div>
         <div style={{marginTop: 24}}>
-        <Link href="/vaccinationRec" className="px-4 py-2 cursor-pointer rounded-lg bg-white" style={{border: '1px solid brown', color:'brown'}}>Add vaccination and clinical records</Link>
+        <Link href={`/vaccinationRec?objId=${metaData.objectId}`} className="px-4 py-2 cursor-pointer rounded-lg bg-white" style={{border: '1px solid brown', color:'brown'}}>Add vaccination and clinical records</Link>
         </div>
         <div style={{marginTop: 24}}>
         <Link href={`/adoptionForm?peturl=${encodeURIComponent(metaData.content.fields.url.slice(7))}`} className="px-4 py-2 cursor-pointer rounded-lg bg-white" style={{border: '1px solid brown', color:'brown'}}>Up for adoption</Link>

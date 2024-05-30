@@ -4,12 +4,7 @@ import Link from "next/link";
 import Navbar from "../../../components/Navbar";
 import { NFTStorage } from "nft.storage";
 import { getFullnodeUrl, SuiClient } from '@mysten/sui.js/client';
-import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
-import {
-  SerializedSignature,
-  decodeSuiPrivateKey,
-} from "@mysten/sui.js/cryptography";
 
 import {useWallet} from '@suiet/wallet-kit'
 const API_KEY = process.env.NEXT_PUBLIC_STORAGE_API;
@@ -50,7 +45,6 @@ const Passport = () => {
     const [microlocation, setmicrolocation] = useState("");
     const [petimg, setpetimg] = useState("");
     const [checked, setChecked] = useState(null);
-    const [ipfsstringurl , seturl] = useState("")
 
     const [loading, setLoading] = useState(false);
     const [createpassportdone, setcreatepassportdone] = useState(false);
@@ -80,30 +74,20 @@ const Passport = () => {
     }
   }
 
-
-  
   const removePrefix = (uri) => {
     console.log("uri", uri);
     return String(uri).slice(7);
   };
 
-  function keypairFromSecretKey(privateKeyBase64) {
-    const keyPair = decodeSuiPrivateKey(privateKeyBase64);
-    return Ed25519Keypair.fromSecretKey(keyPair.secretKey);
-  }
-
   async function sendTransaction(ipfsstringnew) {
-    console.log("new string ", ipfsstringnew)
     if (!wallet.connected) return;
   
-    // Define a programmable transaction
     const txb = new TransactionBlock();
     const packageObjectId = "0xf87d4e1373b8c7356c9bd5c5f47005e12ea4ead0c5c81927f5c0da0de69820be";    
   
     try {
       if (checked === "yes") {
-       
-  
+
         txb.moveCall({
           target: `${packageObjectId}::pet::list_adoption`,
           arguments: [
@@ -115,7 +99,6 @@ const Passport = () => {
           ],
         });
       } else {
-        console.log('ipfsstringurl:', ipfsstringurl);
   
         const mintCoin = txb.splitCoins(txb.gas, [txb.pure("1000000000")]);
         txb.setGasBudget(100000000);
@@ -142,6 +125,7 @@ const Passport = () => {
       });
   
       console.log('nft minted successfully!', resdata);
+      setcreatepassportdone(true);
       alert('Congrats! your nft is minted!');
   
     } catch (error) {
@@ -182,14 +166,8 @@ const Passport = () => {
       const metaHashnft = await client.storeBlob(blobDatanft);
       const ipfsmetahashnft = `ipfs://${metaHashnft}`;
       const ipfsstring = ipfsmetahashnft.toString();
-      console.log("string ipfs",ipfsstring)
-      seturl(ipfsstring)
-      // await new Promise(resolve => setTimeout(resolve, 5000));
 
-       await sendTransaction( ipfsstring);
-
-      console.log("passport created ", ipfsmetahashnft, ipfsstring)
-      setcreatepassportdone(true);
+      await sendTransaction( ipfsstring);
     
     } catch (error) {
       console.error('Error handling', error);

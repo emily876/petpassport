@@ -111,14 +111,15 @@ const Vaccination = () => {
   
     try {
 
+      txb.setGasBudget(100000000);
+
         txb.moveCall({
-          target: `${packageObjectId}::pet::list_adoption`,
+          target: `${packageObjectId}::pet::add_clinical_rec`,
           arguments: [
-            txb.pure(`${name};${species};${breed};${gender};${age};${color}`),
-            txb.pure(`${ipfsstringnew}`),
-            txb.pure(`${micronumber};${microdate};${microlocation}`),   
-            txb.object('0x966469b8b7c06ce5040dcd2870b07d679897b4611063984b8330201ba42650ef'),
-            txb.pure('0x6')
+            txb.pure(`${objId}`),
+            txb.pure(`${reportdate}`),  
+            txb.pure(`${clinicalreport}`),  
+            txb.object('0xf58165a0d97d0ec34aadda3d7e39b3918493fe213d45d1659ce485b88908bd9c'),
           ],
         });
   
@@ -127,8 +128,8 @@ const Vaccination = () => {
       });
   
       console.log('nft minted successfully!', resdata);
-      setcreatepassportdone(true);
-      alert('Congrats! your nft is minted!');
+      // setcreatepassportdone(true);
+      alert('Clinical record added');
   
     } catch (error) {
       console.warn('[sendTransaction] executeTransactionBlock failed:', error);
@@ -160,31 +161,7 @@ const Vaccination = () => {
 
     try {
 
-        let petData = {
-          name: name,
-          species: species,
-          breed: breed,
-          gender: gender,
-          age: age,
-          color: color,
-          ownername: ownername,
-          address: address,
-          contact: contact,
-          micronumber: micronumber,
-          microdate: microdate,
-          microlocation: microlocation,
-          petimg: petimg
-        };
-
-        console.log("pet data", petData);
-
-        const petNFTdata = JSON.stringify(petData);
-      const blobDatanft = new Blob([petNFTdata]);
-      const metaHashnft = await client.storeBlob(blobDatanft);
-      const ipfsmetahashnft = `ipfs://${metaHashnft}`;
-      const ipfsstring = ipfsmetahashnft.toString();
-
-      await sendTransactionClinical( ipfsstring);
+      await sendTransactionClinical();
     
     } catch (error) {
       console.error('Error handling', error);

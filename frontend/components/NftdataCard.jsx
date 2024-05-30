@@ -16,6 +16,7 @@ const NftdataCard = ({
 }) => {
 
   const [imageSrc, setImageSrc] = useState(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -50,6 +51,31 @@ const NftdataCard = ({
   }
 
   return (
+    <>
+    { isDropdownOpen ? (
+  <div className="z-50 flex items-center justify-center bg-opacity-50 w-full rounded-2xl"
+  style={{
+    boxShadow: "inset -10px -10px 60px 0 rgba(255, 255, 255, 0.4)",
+    backgroundColor: "rgba(255, 255, 255, 0.4)"
+  }}
+  >
+    <div className="rounded-lg shadow-lg w-full text-black h-full justify-center items-center mx-auto flex flex-col gap-10 text-center">
+        <div className="">
+        <Link href="/transfer" className="px-4 py-2 cursor-pointer rounded-lg bg-white" style={{border: '1px solid brown', color:'brown'}}>Transfer Pet</Link>
+        </div>
+        <div style={{marginTop: 24}}>
+        <Link href="/vaccinationRec" className="px-4 py-2 cursor-pointer rounded-lg bg-white" style={{border: '1px solid brown', color:'brown'}}>Add vaccination record</Link>
+        </div>
+        <div style={{marginTop: 24}}>
+        <Link href="/clinicalRec" className="px-4 py-2 cursor-pointer rounded-lg bg-white" style={{border: '1px solid brown', color:'brown'}}>Add clinical record</Link>
+        </div>
+      <button onClick={()=>{setIsDropdownOpen(!isDropdownOpen)}} className="mt-4 px-10 py-2 rounded-lg text-white" style={{backgroundColor:'red',}}>
+        Close
+      </button>
+    </div>
+  </div>
+    ):(
+
     <div className="w-full rounded-2xl" 
     style={{
       boxShadow: "inset -10px -10px 60px 0 rgba(255, 255, 255, 0.4)",
@@ -58,9 +84,13 @@ const NftdataCard = ({
       <div className="w-full h-full rounded-lg p-4">
         <div>
           <div className="justify-between flex">
-          <button className="rounded-full">
-            <img src="https://cdn-icons-png.flaticon.com/256/10949/10949950.png" style={{width:30, marginTop:-20}}/>
+          <button onClick={()=>{setIsDropdownOpen(!isDropdownOpen)}} className="rounded-full">
+            <img
+              src="https://cdn-icons-png.flaticon.com/256/10949/10949950.png"
+              style={{ width: 30, marginTop: -20 }}
+            />
           </button>
+
         <Link href={`https://suiscan.xyz/devnet/object/${metaData.objectId}`} target="_blank">
         <div className="flex gap-4 text-black">
         <div className="text-sm py-4 font-bold">View on explorer</div>
@@ -142,6 +172,8 @@ const NftdataCard = ({
         </div>
       </div>
     </div>
+    )}
+    </>
   );
 };
 

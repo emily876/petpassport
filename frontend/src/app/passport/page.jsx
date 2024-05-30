@@ -430,7 +430,7 @@ const Passport = () => {
                           </div>
                 </div>
 
-              <div className="w-1/2">
+              {/* <div className="w-1/2">
                   <div className="mt-10 text-xl">Is it up for adoption?</div>
                   <div className="flex flex-col text-lg">
               <label>
@@ -453,7 +453,7 @@ const Passport = () => {
                 No
               </label>
             </div>
-                </div>
+                </div> */}
 
                 
 

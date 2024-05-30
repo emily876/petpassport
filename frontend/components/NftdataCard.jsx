@@ -40,14 +40,18 @@ const NftdataCard = ({
   }
 
   return (
-    <div className="w-full rounded-2xl" style={{ backgroundColor:'#202333', border: '1px solid #0162FF'}}>
+    <div className="w-full rounded-2xl" 
+    style={{
+      boxShadow: "inset -10px -10px 60px 0 rgba(255, 255, 255, 0.4)",
+      backgroundColor: "rgba(255, 255, 255, 0.4)"
+    }}>
       <div className="w-full h-full rounded-lg p-4">
         <div>
           <div className="justify-end flex">
         <Link href={`https://suiscan.xyz/devnet/object/${metaData.objectId}`} target="_blank">
         <div className="flex gap-4 text-white">
         <div className="text-sm py-4">View on explorer</div>
-              <img src="/reviewicon.gif" alt="" className="" width="80" height="50" />
+              <img src="https://cdn.dribbble.com/users/1665993/screenshots/3881539/dogsicon.gif" alt="" className="rounded-full" width="80"/>
               </div>
               </Link>
               </div>
@@ -68,14 +72,14 @@ const NftdataCard = ({
 
               <div className="rounded-xl">
                 <div className="text-md text-white text-start flex mt-2 mb-2">
-                    <span className="font-bold" style={{color:'orange'}}>Question: &nbsp;</span> {metaData.content.fields.question}
+                    <span className="font-bold" style={{color:'orange'}}>Name: &nbsp;</span> {metaData.content.fields.pet_info[0]}
                 </div>
               </div>
 
               <div className="rounded-xl">
                 <div className="text-white text-start mt-2">
-                <div className="font-bold text-md" style={{color:'yellowgreen'}}>Reading: &nbsp;</div> 
-                <div className="text-sm" style={{marginTop:8}}>{metaData.content.fields.reading}</div>
+                <div className="font-bold text-md" style={{color:'yellowgreen'}}>Owner: &nbsp;</div> 
+                <div className="text-sm" style={{marginTop:8}}>{metaData.content.fields.owner_info[0]}</div>
                 </div>
               </div>
             </div>

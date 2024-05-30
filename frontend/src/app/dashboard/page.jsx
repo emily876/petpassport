@@ -68,10 +68,31 @@ style={{backgroundImage: 'url(https://wallpapers.com/images/hd/brown-background-
        <Navbar />
        </div>
        </div>
-          <div className='font-bold text-5xl mt-20 mb-10' style={{color:'#640D6B'}}>Your registered Pets</div>
+          <div className='font-bold text-5xl mt-20 mb-10' style={{color:'#640D6B'}}>Your Registered Pets</div>
 
           <NftdataContainer metaDataArray={nftdata} MyReviews={false} />
     </div>
+
+    {loading && (
+        <div
+          style={{ backgroundColor: "#222944E5" }}
+          className="flex overflow-y-auto overflow-x-hidden fixed inset-0 z-50 justify-center items-center w-full max-h-full"
+          id="popupmodal"
+        >
+          <div className="relative p-4 lg:w-1/5 w-full max-w-2xl max-h-full">
+            <div className="relative rounded-lg shadow">
+              <div className="flex justify-center gap-4">
+                <img
+                  className="w-100 h-90"
+                  src="/loader.gif"
+                  alt="Loading icon"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
     </main>
   )

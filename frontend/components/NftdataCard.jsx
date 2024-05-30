@@ -74,24 +74,60 @@ const NftdataCard = ({
                       }/${imageSrc}`}
                       className=""
                     />
-                    <div className="text-center mt-4 text-sm">
-                        {metaData.content.fields.card}
+                    <div className="text-center mt-4 text-sm font-bold" style={{color:'brown'}}>
+                    {metaData.content.fields.pet_info[0]}, {metaData.content.fields.pet_info[1]}, Age: {metaData.content.fields.pet_info[4]}
                   </div>
             </div>
             <div className="w-full">
 
               <div className="rounded-xl">
-                <div className="text-md text-black text-start flex mt-2 mb-2">
-                    <span className="font-bold" style={{color:'black'}}>Name: &nbsp;</span> {metaData.content.fields.pet_info[0]}
+                <div className="text-md text-black text-start flex mt-2 mb-2 justify-between">
+                  <div>
+                    <span className="font-bold" style={{color:'black'}}>Breed: &nbsp;</span> {metaData.content.fields.pet_info[2]}
+                    </div>
+                    <div>
+                    <span className="font-bold" style={{color:'black'}}>Gender: &nbsp;</span> {metaData.content.fields.pet_info[3]}
+                    </div>
                 </div>
               </div>
 
-              <div className="rounded-xl">
                 <div className="text-black text-start mt-2">
-                <div className="font-bold text-md" style={{color:'black'}}>Owner: &nbsp;</div> 
-                <div className="text-sm" style={{marginTop:8}}>{metaData.content.fields.owner_info[0]}</div>
+                <span className="font-bold text-md" style={{color:'black'}}>Color/Markings: &nbsp;</span> 
+                <span className="text-sm">{metaData.content.fields.pet_info[5]}</span>
                 </div>
-              </div>
+
+                <div className="text-black text-start mt-2 flex justify-between">
+                  <div>
+                <span className="font-bold text-md" style={{color:'black'}}>Owner: &nbsp;</span> 
+                <span className="text-sm">{metaData.content.fields.owner_info[0]}</span>
+                </div>
+                <div>
+                <span className="font-bold text-md" style={{color:'black'}}>Contact: &nbsp;</span> 
+                <span className="text-sm">{metaData.content.fields.owner_info[1]}</span>
+                </div>
+                </div>
+
+                <div className="text-black text-start mt-2 flex justify-between gap-4">
+                  <div>
+                <div className="font-bold text-md" style={{color:'black'}}>Microchip number: &nbsp;</div> 
+                <div className="text-sm">{metaData.content.fields.microchip_info[0]}</div>
+                </div>
+                <div>
+                <div className="font-bold text-md" style={{color:'black'}}>Microchip date: &nbsp;</div> 
+                <div className="text-sm">{metaData.content.fields.microchip_info[1]}</div>
+                </div>
+                </div>
+
+                <div className="text-black text-start mt-2">
+                <span className="font-bold text-md" style={{color:'black'}}>Microchip location: &nbsp;</span> 
+                <span className="text-sm">{metaData.content.fields.microchip_info[2]}</span>
+                </div>
+
+                <div className="text-black text-start mt-2">
+                <span className="font-bold text-md" style={{color:'black'}}>Vaccination Record: &nbsp;</span> 
+                <span className="text-sm">{metaData.content.fields.vaccination_rec.length > 0 ? metaData.content.fields.vaccination_rec[0]: "Not Entered"}</span>
+                </div>
+
             </div>
           </div>
         </div>

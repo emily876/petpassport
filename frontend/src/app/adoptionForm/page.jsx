@@ -11,6 +11,7 @@ const AdoptionForm = () => {
   const [loading, setLoading] = useState(false);
   const [imageSrc, setImageSrc] = useState(null);
   const [petdata, setpetdata] = useState(null);
+  const [adoptionputdone, setadoptionputdone] = useState(false);
 
   const wallet = useWallet();
 
@@ -49,6 +50,8 @@ const AdoptionForm = () => {
   async function sendTransaction() {
     if (!wallet.connected) return;
 
+    setLoading(true);
+
     const txb = new TransactionBlock();
     const packageObjectId =
       "0xf87d4e1373b8c7356c9bd5c5f47005e12ea4ead0c5c81927f5c0da0de69820be";
@@ -78,8 +81,8 @@ const AdoptionForm = () => {
       });
 
       console.log("nft minted successfully!", resdata);
-      // setcreatepassportdone(true);
-      alert("For adoption done");
+      setadoptionputdone(true);
+      setLoading(false);
     } catch (error) {
       console.warn("[sendTransaction] executeTransactionBlock failed:", error);
     }
@@ -177,6 +180,29 @@ const AdoptionForm = () => {
             </form>
           </div>
         </div>
+
+        { adoptionputdone && (
+          <div
+          style={{ backgroundColor: '#222944E5' }}
+          className="flex overflow-y-auto overflow-x-hidden fixed inset-0 z-50 justify-center items-center w-full max-h-full"
+          id="popupmodal"
+        >
+          <div className="relative p-4 lg:w-1/3 w-full max-w-2xl max-h-full">
+            <div className="relative rounded-lg shadow text-white" style={{backgroundColor:'#ECB176'}}>
+              <div className="flex items-center justify-end p-4 md:p-5 rounded-t dark:border-gray-600"></div>
+
+              <div className="p-4 space-y-4 pt-10">
+                <p className="text-3xl text-center font-bold" style={{color:'#640D6B'}}>
+                Your pet has been put for adoption.
+                </p>
+                <Link href="/dashboard">
+                  <button className="px-4 py-3 flex rounded-lg mx-auto text-white m-10" style={{backgroundColor:'#640D6B'}}>Go to Dashboard</button>
+                  </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
         {loading && (
           <div

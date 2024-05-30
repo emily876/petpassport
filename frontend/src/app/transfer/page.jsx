@@ -10,11 +10,37 @@ const Transfer = () => {
 
     const [address, setaddress] = useState("");
     const [loading, setLoading] = useState(false);
+    const [imageSrc, setImageSrc] = useState(null);
+    const [petdata, setpetdata] = useState(null);
+  
 
     const wallet = useWallet();
 
     const searchParams = useSearchParams();
     const objId = searchParams.get("objId");
+    const peturl = searchParams.get("peturl");
+
+    console.log("peturl: " + peturl, objId);
+
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const urlhash = peturl;
+          console.log("urlhash", urlhash);
+          const data = await fetch(`https://nftstorage.link/ipfs/${urlhash}`); // Replace with your IPFS hash
+          const ipfsdata = await data.json();
+  
+          const ipfsCid = ipfsdata.petimg.replace("ipfs://", "");
+          setpetdata(ipfsdata);
+          setImageSrc(ipfsCid);
+          console.log("ipfs data", ipfsdata);
+        } catch (err) {
+          console.log("Failed to fetch data from IPFS");
+        }
+      };
+  
+      fetchData();
+    }, [peturl]);
 
     async function sendTransaction() {
         if (!wallet.connected) return;
@@ -84,6 +110,23 @@ const Transfer = () => {
         </div>
         <div className="flex flex-col justify-center items-center">
           <div className="w-2/3 bg-white px-10 pt-10 pb-32 text-black rounded-3xl">
+
+          {imageSrc ? (
+              <img
+                alt="alt"
+                src={`${"https://nftstorage.link/ipfs"}/${imageSrc}`}
+                className="rounded-full w-40 h-40"
+              />
+            ) : (
+              <img
+                alt="alt"
+                src={`https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgv-OTIZFq4vgV-pN5dJEKzox2aDB1aiaYGQ&s`}
+                className="rounded-full w-40 h-40"
+              />
+            )}
+
+            <div>{petdata?.name}</div>
+
             <form id="myForm"
                     onSubmit={(e) => {
                       submitDataForPassport(e);

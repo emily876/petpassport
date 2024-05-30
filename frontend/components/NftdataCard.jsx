@@ -57,7 +57,10 @@ const NftdataCard = ({
     }}>
       <div className="w-full h-full rounded-lg p-4">
         <div>
-          <div className="justify-end flex">
+          <div className="justify-between flex">
+          <button className="rounded-full">
+            <img src="https://cdn-icons-png.flaticon.com/256/10949/10949950.png" style={{width:30, marginTop:-20}}/>
+          </button>
         <Link href={`https://suiscan.xyz/devnet/object/${metaData.objectId}`} target="_blank">
         <div className="flex gap-4 text-black">
         <div className="text-sm py-4 font-bold">View on explorer</div>
@@ -67,13 +70,19 @@ const NftdataCard = ({
               </div>
           <div className="flex flex-row gap-4">
             <div className="w-1/2">
-              <img
+              {imageSrc ? (<img
                       alt="alt"
                       src={`${
                         "https://nftstorage.link/ipfs"
                       }/${imageSrc}`}
-                      className=""
+                      className="rounded-full w-40 h-40"
+                    />):(
+                      <img
+                      alt="alt"
+                      src={`https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgv-OTIZFq4vgV-pN5dJEKzox2aDB1aiaYGQ&s`}
+                      className="rounded-full w-40 h-40"
                     />
+                    )}
                     <div className="text-center mt-4 text-sm font-bold" style={{color:'brown'}}>
                     {metaData.content.fields.pet_info[0]}, {metaData.content.fields.pet_info[1]}, Age: {metaData.content.fields.pet_info[4]}
                   </div>

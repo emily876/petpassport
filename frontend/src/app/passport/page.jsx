@@ -50,6 +50,7 @@ const Passport = () => {
     const [microlocation, setmicrolocation] = useState("");
     const [petimg, setpetimg] = useState("");
     const [checked, setChecked] = useState(null);
+    const [ipfsstringurl , seturl] = useState("")
 
     const [loading, setLoading] = useState(false);
     const [createpassportdone, setcreatepassportdone] = useState(false);
@@ -91,62 +92,63 @@ const Passport = () => {
     return Ed25519Keypair.fromSecretKey(keyPair.secretKey);
   }
 
-  async function sendTransaction(ipfsmetahashnfturl ) {
-   
-      if (!wallet.connected) return;
-    
-    //   // define a programmable transaction
-      const txb = new TransactionBlock();
-      const packageObjectId = "0xf87d4e1373b8c7356c9bd5c5f47005e12ea4ead0c5c81927f5c0da0de69820be";    
-     try{
-    
-      if(checked === "yes")
-        {
-          txb.moveCall({
-            target: `${packageObjectId}::pet::list_adoption`,
-            arguments: [
-              txb.pure(`${name};${species};${breed};${gender};${age};${color}`),
-              txb.pure(`${ipfsmetahashnfturl}`),
-              txb.pure(`${micronumber};${microdate};${microlocation}`),   
-              txb.object('0x966469b8b7c06ce5040dcd2870b07d679897b4611063984b8330201ba42650ef'),
-              txb.pure('0x6')
-            ],
-          });
-        }
-
-        else{
-          const mintCoin = txb.splitCoins(txb.gas, [txb.pure("1000000000")]);
-
-          txb.setGasBudget(100000000);
-
-          txb.moveCall({
-            target: `${packageObjectId}::pet::mint_passport`,
-            arguments: [
-              txb.pure(`${name};${species};${breed};${gender};${age};${color}`),
-              txb.pure(`${ipfsmetahashnfturl}`),
-              txb.pure(`${ownername};${contact}`),   
-              txb.pure(`${address}`),   
-              txb.pure(`${micronumber};${microdate};${microlocation}`),   
-              mintCoin,
-              txb.object('0x966469b8b7c06ce5040dcd2870b07d679897b4611063984b8330201ba42650ef')
-            ],
-          }); 
-              
-        }
-        const resdata = await wallet.signAndExecuteTransactionBlock({
-          transactionBlock: txb,
+  async function sendTransaction(ipfsstringnew) {
+    console.log("new string ", ipfsstringnew)
+    if (!wallet.connected) return;
+  
+    // Define a programmable transaction
+    const txb = new TransactionBlock();
+    const packageObjectId = "0xf87d4e1373b8c7356c9bd5c5f47005e12ea4ead0c5c81927f5c0da0de69820be";    
+  
+    try {
+      if (checked === "yes") {
+       
+  
+        txb.moveCall({
+          target: `${packageObjectId}::pet::list_adoption`,
+          arguments: [
+            txb.pure(`${name};${species};${breed};${gender};${age};${color}`),
+            txb.pure(`${ipfsstringnew}`),
+            txb.pure(`${micronumber};${microdate};${microlocation}`),   
+            txb.object('0x966469b8b7c06ce5040dcd2870b07d679897b4611063984b8330201ba42650ef'),
+            txb.pure('0x6')
+          ],
         });
-      
-        console.log('nft minted successfully!', resdata);
-        alert('Congrats! your nft is minted!')
-      
-      
-      
-      // await queryevents();
+      } else {
+        console.log('ipfsstringurl:', ipfsstringurl);
+  
+        const mintCoin = txb.splitCoins(txb.gas, [txb.pure("1000000000")]);
+        txb.setGasBudget(100000000);
+  
+        // 5-second delay
+        await new Promise(resolve => setTimeout(resolve, 5000));
+  
+        txb.moveCall({
+          target: `${packageObjectId}::pet::mint_passport`,
+          arguments: [
+            txb.pure(`${name};${species};${breed};${gender};${age};${color}`),
+            txb.pure(`${ipfsstringnew}`),
+            txb.pure(`${ownername};${contact}`),   
+            txb.pure(`${address}`),   
+            txb.pure(`${micronumber};${microdate};${microlocation}`),   
+            mintCoin,
+            txb.object('0x966469b8b7c06ce5040dcd2870b07d679897b4611063984b8330201ba42650ef')
+          ],
+        });
+      }
+  
+      const resdata = await wallet.signAndExecuteTransactionBlock({
+        transactionBlock: txb,
+      });
+  
+      console.log('nft minted successfully!', resdata);
+      alert('Congrats! your nft is minted!');
+  
     } catch (error) {
       console.warn('[sendTransaction] executeTransactionBlock failed:', error);
     }
-}
+  }
+  
   
 
 
@@ -180,8 +182,11 @@ const Passport = () => {
       const metaHashnft = await client.storeBlob(blobDatanft);
       const ipfsmetahashnft = `ipfs://${metaHashnft}`;
       const ipfsstring = ipfsmetahashnft.toString();
+      console.log("string ipfs",ipfsstring)
+      seturl(ipfsstring)
+      // await new Promise(resolve => setTimeout(resolve, 5000));
 
-      sendTransaction(accounts.current[0], ipfsstring);
+       await sendTransaction( ipfsstring);
 
       console.log("passport created ", ipfsmetahashnft, ipfsstring)
       setcreatepassportdone(true);

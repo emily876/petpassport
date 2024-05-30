@@ -306,7 +306,7 @@ const Passport = () => {
                 </div>
 
                 <div className="w-1/2">
-                  <div className="mt-10 text-xl">Recipient Wallet Address</div>
+                  <div className="mt-10 text-xl">Sui Wallet Address</div>
                   <input
                     type="text"
                     placeholder="Address"

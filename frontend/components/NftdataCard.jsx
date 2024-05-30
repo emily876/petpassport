@@ -18,12 +18,22 @@ const NftdataCard = ({
   const [imageSrc, setImageSrc] = useState(null);
 
   useEffect(() => {
-    const fetchMetaData = async () => {
-    const ipfsCid = metaData.content.fields.url.replace("ipfs://", "");
+    const fetchData = async () => {
+      try {
+        const urlhash = metaData.content.fields.url.slice(7)
+        console.log("urlhash", urlhash);
+        const data = await fetch(`https://nftstorage.link/ipfs/${urlhash}`); // Replace with your IPFS hash
+        const ipfsdata = await data.json();
 
-  setImageSrc(ipfsCid);
-    }
-    fetchMetaData();
+        const ipfsCid = ipfsdata.petimg.replace("ipfs://", "");
+        setImageSrc(ipfsCid);
+        console.log("ipfs data", ipfsdata)
+      } catch (err) {
+        console.log('Failed to fetch data from IPFS');
+      }
+    };
+
+    fetchData();
   }, [metaData]);
 
   if (!metaData) {
@@ -49,8 +59,8 @@ const NftdataCard = ({
         <div>
           <div className="justify-end flex">
         <Link href={`https://suiscan.xyz/devnet/object/${metaData.objectId}`} target="_blank">
-        <div className="flex gap-4 text-white">
-        <div className="text-sm py-4">View on explorer</div>
+        <div className="flex gap-4 text-black">
+        <div className="text-sm py-4 font-bold">View on explorer</div>
               <img src="https://cdn.dribbble.com/users/1665993/screenshots/3881539/dogsicon.gif" alt="" className="rounded-full" width="80"/>
               </div>
               </Link>
@@ -71,14 +81,14 @@ const NftdataCard = ({
             <div className="w-full">
 
               <div className="rounded-xl">
-                <div className="text-md text-white text-start flex mt-2 mb-2">
-                    <span className="font-bold" style={{color:'orange'}}>Name: &nbsp;</span> {metaData.content.fields.pet_info[0]}
+                <div className="text-md text-black text-start flex mt-2 mb-2">
+                    <span className="font-bold" style={{color:'black'}}>Name: &nbsp;</span> {metaData.content.fields.pet_info[0]}
                 </div>
               </div>
 
               <div className="rounded-xl">
-                <div className="text-white text-start mt-2">
-                <div className="font-bold text-md" style={{color:'yellowgreen'}}>Owner: &nbsp;</div> 
+                <div className="text-black text-start mt-2">
+                <div className="font-bold text-md" style={{color:'black'}}>Owner: &nbsp;</div> 
                 <div className="text-sm" style={{marginTop:8}}>{metaData.content.fields.owner_info[0]}</div>
                 </div>
               </div>

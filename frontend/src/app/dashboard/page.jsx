@@ -68,7 +68,7 @@ style={{backgroundImage: 'url(https://wallpapers.com/images/hd/brown-background-
        <Navbar />
        </div>
        </div>
-          <div className='font-bold text-5xl mt-20' style={{color:'#640D6B'}}>Pets for adoption</div>
+          <div className='font-bold text-5xl mt-20 mb-10' style={{color:'#640D6B'}}>Your registered Pets</div>
 
           <NftdataContainer metaDataArray={nftdata} MyReviews={false} />
     </div>

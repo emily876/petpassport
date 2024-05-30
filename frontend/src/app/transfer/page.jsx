@@ -50,6 +50,7 @@ const Transfer = () => {
           "0xc746e92ad9d529248a3c8a4f8707a8a82c9c17d374ea11e887549c5c1b711545";
     
         try {
+          txb.setGasBudget(100000000);
     
           txb.moveCall({
             target: `${packageObjectId}::pet::transfer`,

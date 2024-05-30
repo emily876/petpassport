@@ -81,7 +81,7 @@ style={{backgroundImage: 'url(https://wallpapers.com/images/hd/brown-background-
         </div>
       )} */}
 
-      {loading && (
+      {/* {loading && (
         <div
           style={{ backgroundColor: "#222944E5" }}
           className="flex overflow-y-auto overflow-x-hidden fixed inset-0 z-50 justify-center items-center w-full max-h-full"
@@ -99,7 +99,7 @@ style={{backgroundImage: 'url(https://wallpapers.com/images/hd/brown-background-
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
     </main>
   );

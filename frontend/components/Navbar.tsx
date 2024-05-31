@@ -573,7 +573,7 @@ const Navbar = () => {
               <Link
                 href="/passport"
                 className="text-white font-bold rounded-lg py-2 px-10 text-lg"
-                style={{ backgroundColor: '#640D6B' }}
+                style={{ backgroundColor: '#640D6B', height:45 }}
               >
                 <div className="mt-2">Pet Form</div>
               </Link>

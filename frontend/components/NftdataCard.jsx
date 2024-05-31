@@ -59,9 +59,9 @@ const NftdataCard = ({
     backgroundColor: "rgba(255, 255, 255, 0.4)"
   }}
   >
-    <div className="rounded-lg shadow-lg w-full text-black h-full justify-center items-center mx-auto flex flex-col gap-10 text-center" style={{padding:40}}>
+    <div className="rounded-lg shadow-lg w-full text-black h-full justify-center items-center mx-auto flex flex-col gap-10 text-center" style={{paddingTop:80, paddingBottom:80}}>
         <div className="">
-        <Link href={`/transfer?objId=${metaData.objectId}&peturl=${encodeURIComponent(metaData.content.fields.url.slice(7))}`} className="px-4 py-3 cursor-pointer rounded-lg bg-white" style={{border: '1px solid brown', color:'brown'}}>Transfer Pet</Link>
+        <Link href={`/transfer?objId=${metaData.objectId}&peturl=${encodeURIComponent(metaData.content.fields.url.slice(7))}`} className="px-10 py-3 cursor-pointer rounded-lg bg-white" style={{border: '1px solid brown', color:'brown'}}>Transfer Pet</Link>
         </div>
         {/* <div style={{marginTop: 40}}>
         <Link href={`/vaccinationRec?objId=${metaData.objectId}`} className="px-4 py-3 cursor-pointer rounded-lg bg-white mt-4" style={{border: '1px solid brown', color:'brown'}}>Add vaccination and clinical records</Link>

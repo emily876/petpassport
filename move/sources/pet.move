@@ -11,7 +11,6 @@ module deployer::pet {
     use sui::table::{Self, Table};
     use sui::coin::{Self, Coin};
     use sui::sui::SUI;
-    use sui::clock::{Self, Clock};
     //use std::debug;
 
     use deployer::role::{Self, Roles};
@@ -35,6 +34,7 @@ module deployer::pet {
     const ERROR_SIGNER_NOT_VET: u64 = 3;
     const ERROR_SIGNER_NOT_ADMIN_OR_OPERATOR: u64 = 4;
     const ERROR_NOT_AVAILABLE_FOR_ADOPTION: u64 = 5;
+    const ERROR_NOT_ADOPTED_YET: u64 = 6;
 
     //==============================================================================================
     // Structs 
@@ -44,7 +44,7 @@ module deployer::pet {
         //no of minted nft from this contract collection
         minted: u64,
         // list of pets waiting for adoption
-        adoption: Table<u64, TempPetPassport>
+        adoption: vector<ID>
     }
 
     struct PetPassport has key {
@@ -69,15 +69,16 @@ module deployer::pet {
     }
 
     //for those waiting for adoption
-    struct TempPetPassport has store, drop {
-        id: u64,
+    struct AdoptionPet has key {
+        id: UID,
         // photo
         url: String,
         royalty_numerator: u64,
         // <name, species, breed, gender, dob, color/markings>
         pet_info: vector<String>,
         // <microchip number, date of chipping, location of microchip>
-        microchip_info: vector<String>
+        microchip_info: vector<String>,
+        adopted: bool
     }
 
     //==============================================================================================
@@ -98,7 +99,7 @@ module deployer::pet {
     //==============================================================================================
 
     fun init(ctx: &mut TxContext) {
-        transfer::share_object(State{id: object::new(ctx), minted: 0, adoption: table::new<u64, TempPetPassport>(ctx)});
+        transfer::share_object(State{id: object::new(ctx), minted: 0, adoption: vector::empty()});
     }
 
     //==============================================================================================
@@ -147,18 +148,20 @@ module deployer::pet {
         // <microchip number, date of chipping, location of microchip>
         microchip_info: String,
         state: &mut State,
-        clock: &Clock,
         ctx: &mut TxContext
     ) {
-        let id = clock::timestamp_ms(clock);
-        let temp = TempPetPassport{
-            id,
+        let uid = object::new(ctx);
+        let id = sui::object::uid_to_inner(&uid);
+        let adoption = AdoptionPet{
+            id: uid,
             url,
             royalty_numerator: 5,
             pet_info: create_pet_passport_vector(pet_info),
-            microchip_info: create_pet_passport_vector(microchip_info)
+            microchip_info: create_pet_passport_vector(microchip_info),
+            adopted: false
         };
-        table::add(&mut state.adoption, id, temp);
+        transfer::share_object(adoption);
+        vector::push_back(&mut state.adoption, id);
     }
 
     /// Transfer `nft` to `recipient`
@@ -210,7 +213,7 @@ module deployer::pet {
 
     /// user adopts a pet
     public entry fun adopt(
-        pet_id: u64,
+        pet: AdoptionPet,
         // <name, contact details>
         owner_info: String,
         payment: Coin<SUI>, 
@@ -218,10 +221,10 @@ module deployer::pet {
         state: &mut State,
         ctx: &mut TxContext  
     ){
+        let pet_id = sui::object::uid_to_inner(&pet.id);
         assert_available_for_adoption(&state.adoption, pet_id);
         let sender = tx_context::sender(ctx);
         assert_adopter(sender, roles);
-        let pet = table::borrow(&state.adoption, pet_id);
         let owner_info_vector = create_pet_passport_vector(owner_info);
         vector::push_back(&mut owner_info_vector, address::to_string(sender));
         mint_passport_internal(
@@ -234,7 +237,10 @@ module deployer::pet {
             state, 
             ctx
         );
-        table::remove(&mut state.adoption, pet_id);
+        let (_found, index) = vector::index_of(&state.adoption, &pet_id);
+        vector::remove(&mut state.adoption, index);
+        pet.adopted = true;
+        burn_adoption(pet, ctx);
     }
 
     //==============================================================================================
@@ -245,8 +251,12 @@ module deployer::pet {
         assert!(payment == PRICE, ERROR_INSUFFICIENT_FUNDS);
     }
 
-    fun assert_available_for_adoption(for_adoption: &Table<u64, TempPetPassport>, pet_id: u64){
-        assert!(table::contains(for_adoption, pet_id), ERROR_NOT_AVAILABLE_FOR_ADOPTION);
+    fun assert_available_for_adoption(for_adoption: &vector<ID>, pet_id: ID){
+        assert!(vector::contains(for_adoption, &pet_id), ERROR_NOT_AVAILABLE_FOR_ADOPTION);
+    }
+
+    fun assert_adopted(adopted: bool){
+        assert!(adopted, ERROR_NOT_ADOPTED_YET);
     }
 
     fun num_to_string(num: u64): String {
@@ -261,7 +271,6 @@ module deployer::pet {
                 num = num / 10;
             };
         };
-
         vector::reverse(&mut num_vec);
         string::utf8(num_vec)
     }
@@ -323,6 +332,23 @@ module deployer::pet {
             name: nft.name,
         });
         transfer::transfer(nft, receiver);
+    }
+
+    /// Permanently delete `nft`
+    public entry fun burn_adoption(
+        nft: AdoptionPet, 
+        _: &mut TxContext) 
+    {
+        assert_adopted(nft.adopted);
+        let AdoptionPet { 
+            id,
+            url: _, 
+            royalty_numerator: _,
+            pet_info: _,
+            microchip_info: _,
+            adopted: _,
+        } = nft;
+        object::delete(id);
     }
 
     //==============================================================================================
@@ -560,9 +586,6 @@ module deployer::pet {
         
         let scenario_val = test_scenario::begin(module_owner);
         let scenario = &mut scenario_val;
-        {
-            clock::share_for_testing(clock::create_for_testing(test_scenario::ctx(scenario)));
-        };
         test_scenario::next_tx(scenario, user);
         init(test_scenario::ctx(scenario));
         test_scenario::next_tx(scenario, user);
@@ -573,18 +596,14 @@ module deployer::pet {
         let now;
         {
             let state = test_scenario::take_shared<State>(scenario);
-            let clock = test_scenario::take_shared<Clock>(scenario);
             list_adoption(
                 pet_info,
                 url,
                 microchip_info,
                 &mut state,
-                &clock,
                 test_scenario::ctx(scenario)
             );
-            now = clock::timestamp_ms(&clock);
             test_scenario::return_shared(state);
-            test_scenario::return_shared(clock);
         };
         
         role::init_for_testing(test_scenario::ctx(scenario));
@@ -598,8 +617,9 @@ module deployer::pet {
         {
             let roles = test_scenario::take_shared<Roles>(scenario);
             let state = test_scenario::take_shared<State>(scenario);
+            let pet = test_scenario::take_shared<AdoptionPet>(scenario);
             let payment = coin::mint_for_testing<SUI>(PRICE, test_scenario::ctx(scenario));
-            adopt(now, owner_info, payment, &mut roles, &mut state, test_scenario::ctx(scenario));
+            adopt(pet, owner_info, payment, &mut roles, &mut state, test_scenario::ctx(scenario));
             test_scenario::return_shared(roles);
             test_scenario::return_shared(state);
         };

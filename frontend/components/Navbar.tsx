@@ -451,7 +451,7 @@ const Navbar = () => {
           )}
   
           {!wallet.connected && !(accounts.current?.length > 0) && (
-            <button onClick={() => setloginbox(true)} className="text-white text-3xl">
+            <button onClick={() => setloginbox(true)} className="text-black text-lg bg-white py-3 px-10 rounded-lg">
               Login
             </button>
           )}
@@ -495,7 +495,7 @@ const Navbar = () => {
                     </p>
                   </div>
                   <div className="flex flex-col gap-4 items-center p-4 rounded-b pb-20 pt-10 justify-center">
-                    <div className="flex flex-col text-white w-1/2">
+                    <div className="flex text-white w-1/2 justify-center">
                       <ConnectButton label="Connect with Sui" />
                     </div>
   
@@ -575,7 +575,7 @@ const Navbar = () => {
                 className="text-white font-bold rounded-lg py-2 px-10 text-lg"
                 style={{ backgroundColor: '#640D6B' }}
               >
-                Pet Form
+                <div className="mt-2">Pet Form</div>
               </Link>
               <Link href="/dashboard">
                 {avatarUrl && <img src={avatarUrl} alt="Avatar" style={{ width: 45 }} />}

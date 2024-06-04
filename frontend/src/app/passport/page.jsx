@@ -96,7 +96,7 @@ const Passport = () => {
             txb.pure(`${ipfsstringnew}`),
             txb.pure(`${micronumber};${microdate};${microlocation}`),   
             txb.object('0x866cec6f8037b3c4ca3669dcad20f3c3fef99f546a7987539212692fd754fa52'),
-            txb.pure('0x6')
+            // txb.pure('0x6')
           ],
         });
       } else {

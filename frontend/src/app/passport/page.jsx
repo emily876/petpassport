@@ -84,7 +84,7 @@ const Passport = () => {
     if (!wallet.connected) return;
   
     const txb = new TransactionBlock();
-    const packageObjectId = "0xc746e92ad9d529248a3c8a4f8707a8a82c9c17d374ea11e887549c5c1b711545";    
+    const packageObjectId = "0x70f67e5d6cb48ffdffaa866f9e06686ccfa2c566441bda18f33233253186b819";    
   
     try {
       if (checked === "yes") {
@@ -95,7 +95,7 @@ const Passport = () => {
             txb.pure(`${name};${species};${breed};${gender};${age};${color}`),
             txb.pure(`${ipfsstringnew}`),
             txb.pure(`${micronumber};${microdate};${microlocation}`),   
-            txb.object('0xb57ade06e55282cfe6a1fcafe3fd06e1380ccdcf2a6535d9b8454fe9f7c4fe2d'),
+            txb.object('0x866cec6f8037b3c4ca3669dcad20f3c3fef99f546a7987539212692fd754fa52'),
             txb.pure('0x6')
           ],
         });
@@ -116,7 +116,7 @@ const Passport = () => {
             txb.pure(`${address}`),   
             txb.pure(`${micronumber};${microdate};${microlocation}`),   
             mintCoin,
-            txb.object('0xb57ade06e55282cfe6a1fcafe3fd06e1380ccdcf2a6535d9b8454fe9f7c4fe2d')
+            txb.object('0x866cec6f8037b3c4ca3669dcad20f3c3fef99f546a7987539212692fd754fa52')
           ],
         });
       }
